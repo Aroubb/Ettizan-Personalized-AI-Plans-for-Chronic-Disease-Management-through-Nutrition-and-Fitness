@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; // Import Login Page
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_page.dart'; // Import Login Page
 import 'user_profile_page.dart';
 import 'nutritionPlans_page.dart';
-
+import 'exercise_plan_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -50,12 +51,11 @@ class HomePage extends StatelessWidget {
                       const Center(
                         child: Text(
                           'ETTIZAN',
-                        style: TextStyle(
-                        fontFamily: 'Atop', // Replace 'Roboto' with your custom font name
-                        color: Colors.white,
-                        // fontWeight: FontWeight.bold,
-                        fontSize: 42,
-                      ),
+                          style: TextStyle(
+                            fontFamily: 'Atop',
+                            color: Colors.white,
+                            fontSize: 42,
+                          ),
                         ),
                       ),
                       // Back Arrow Button
@@ -103,57 +103,69 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Progress Bar Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  // Fetch and display meals and exercises from Firestore
+                  Expanded(
                     child: Column(
                       children: [
                         const Text(
-                          'Your Progress',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          'Your Meal Plan',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 10),
-                        // Progress Bar with enhanced design
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: 0, // Example: 60% progress
-                            minHeight: 12,
-                            backgroundColor: Colors.grey[300],
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 213, 54, 54)),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          '0% Completed',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection('meals').snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+                            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return const Text("No meals available.");
+                            }
+                            final meals = snapshot.data!.docs;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: meals.length,
+                              itemBuilder: (context, index) {
+                                final mealData = meals[index];
+                                return ListTile(
+                                  title: Text(mealData['name'] ?? 'Meal Name'),
+                                  subtitle: Text(mealData['description'] ?? 'No Description'),
+                                );
+                              },
+                            );
+                          },
                         ),
                         const SizedBox(height: 20),
-                        // Motivational Message
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Text(
-                            'Every journey starts with a single step—let’s get started!',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.teal,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                        const Text(
+                          'Your Exercise Plan',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection('exercises').snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+                            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return const Text("No exercises available.");
+                            }
+                            final exercises = snapshot.data!.docs;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: exercises.length,
+                              itemBuilder: (context, index) {
+                                final exerciseData = exercises[index];
+                                return ListTile(
+                                  title: Text(exerciseData['name'] ?? 'Exercise Name'),
+                                  subtitle: Text(exerciseData['description'] ?? 'No Description'),
+                                );
+                              },
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 30),
-                  // Spacer to push the icons to the bottom
-                  Spacer(),
                   // Footer with Icon Boxes Section
                   Container(
                     decoration: const BoxDecoration(
@@ -179,7 +191,10 @@ class HomePage extends StatelessWidget {
                           icon: Icons.fitness_center,
                           color: Colors.teal.shade300,
                           onTap: () {
-                            // Navigate to Exercises Page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ExercisePlanPage()),
+                            );
                           },
                         ),
                         _buildIconBox(
@@ -188,12 +203,9 @@ class HomePage extends StatelessWidget {
                           icon: Icons.fastfood,
                           color: Colors.green.shade400,
                           onTap: () {
-                            // Navigate to Nutrition Page
                             Navigator.push(
                               context,
-                                   MaterialPageRoute(
-                                    builder: (context) => const NutritionPage(),
-  ),
+                              MaterialPageRoute(builder: (context) => const NutritionPage()),
                             );
                           },
                         ),
@@ -201,12 +213,11 @@ class HomePage extends StatelessWidget {
                           context,
                           title: 'Profile',
                           icon: Icons.person,
-                          color: Color(0xFFFFB6C1),
+                          color: const Color(0xFFFFB6C1),
                           onTap: () {
-                            // Navigate to Profile Page
                             Navigator.push(
                               context,
-                                  MaterialPageRoute(builder: (context) => const UserProfilePage()),
+                              MaterialPageRoute(builder: (context) => const UserProfilePage()),
                             );
                           },
                         ),
