@@ -56,61 +56,128 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: Colors.teal,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditInfoPage(
-                    userId: _auth.currentUser!.uid,
-                    userData: userData,
+      body: Stack(
+        children: [
+          // Header Section
+          Container(
+            height: 250,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Wavy Background
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ClipPath(
+                    clipper: WaveClipper(),
+                    child: Container(
+                      height: 100,
+                      color: const Color(0xFF008080).withOpacity(0.3),
+                    ),
                   ),
                 ),
-              ).then((_) {
-                _fetchUserData(); // Refresh data after editing
-              });
-            },
+                Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: ClipPath(
+                    clipper: WaveClipper(),
+                    child: Container(
+                      height: 80,
+                      color: const Color(0xFF008080).withOpacity(0.5),
+                    ),
+                  ),
+                ),
+                // Profile Header
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 20,
+                  left: 16,
+                  right: 16,
+                  child: Column(
+                    children: [
+                      const CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.teal,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        userData['name'],
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        userData['email'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Back Button
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  left: 16,
+                  child: SafeArea(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ),
+                // Edit Button
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  right: 16,
+                  child: SafeArea(
+                    child: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.white, size: 28),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditInfoPage(
+                              userId: _auth.currentUser!.uid,
+                              userData: userData,
+                            ),
+                          ),
+                        ).then((_) {
+                          _fetchUserData(); // Refresh data after editing
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.teal,
-                child: Icon(
-                  Icons.person,
-                  size: 50,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                'Your Profile',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.teal,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView(
+          // Main Content Section
+          Padding(
+            padding: const EdgeInsets.only(top: 250),
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  _buildProfileCard('Name', userData['name']),
-                  _buildProfileCard('Email', userData['email']),
+                  // Profile Information
+                  const SizedBox(height: 20),
                   _buildProfileCard('Health Condition', userData['healthCondition']),
                   _buildProfileCard('Food Preferences', userData['foodPreferences']),
                   _buildProfileCard('Allergies', userData['allergies']),
@@ -120,8 +187,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -130,7 +197,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -162,4 +229,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
+}
+
+// Custom Clipper for Wave Background
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 20);
+    path.quadraticBezierTo(size.width / 4, size.height, size.width / 2, size.height - 20);
+    path.quadraticBezierTo(3 * size.width / 4, size.height - 40, size.width, size.height - 20);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
