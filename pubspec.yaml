@@ -60,6 +60,17 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+  - images/Ettizan_logo_enhanced22.png
+  - images/cinnamon_toast.png
+  - images/coleslaw.jpg
+  - images/running.jpg
+  - images/smoothie.jpg
+  - images/yoga.jpg
+  - images/yogurt.jpg
+  - images/smoothie1.jpg
+  - images/yogurt2.jpg
+
 
   fonts:
     - family: Atop
@@ -77,6 +88,42 @@ flutter:
     - family: WtfHorselandDemo
       fonts:
         - asset: fonts/WtfHorselandDemo-4n3y6.ttf
+
+
+    - family: OfficialNICK
+      fonts:
+        - asset: fonts/OfficialNICK.ttf
+
+
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Regular.ttf
+
+
+    - family: PTC
+      fonts:
+        - asset: fonts/PTC55F.ttf
+
+
+    - family: CaviarDreams
+      fonts:
+        - asset: fonts/CaviarDreams.ttf
+
+
+
+
+
+  #    - family: JosefinSans
+#      fonts:
+#        - asset: fonts/JosefinSans-SemiBold.ttf
+
+#    - family: Alkia
+#      fonts:
+#        - asset: fonts/Alkia.ttf
+#
+#    - family: Crosever
+#      fonts:
+#        - asset: fonts/Crosever-800rM.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
