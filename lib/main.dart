@@ -1,12 +1,20 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'login_page.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+import 'firebase_options.dart';
 import 'splash_screen.dart';
-import 'home_page.dart'; // Placeholder for your HomePage widget
-import 'firebase_options.dart'; // Ensure this file exists for Firebase configuration
+import 'package:provider/provider.dart';
+import 'progress_provider.dart';
+import 'home_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // Import for localization
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Gemini
+  Gemini.init(apiKey: "AIzaSyCswZ82FR-PQhLMmRtTfs1BworS1u-JH8U");
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -21,13 +29,36 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Ettizan',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightGreen),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProgressProvider()), // Add ProgressProvider
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false, // Disable debug banner
+        title: 'Ettizan',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightGreen),
+          useMaterial3: true,
+        ),
+        // Set up localization
+        supportedLocales: const [
+          Locale('en', ''), // English
+          Locale('ar', ''), // Arabic
+        ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        // Set initial locale based on the device's locale or default to English
+        locale: Locale('en', ''), // You can set this dynamically as per your preference
+        initialRoute: '/', // Set initial route
+        routes: {
+          '/': (context) => const SplashScreen(),
+          '/home': (context) => const HomePage(),
+        },
       ),
-      home: const SplashScreen(), // Start with the LoginPage
     );
   }
 }
+

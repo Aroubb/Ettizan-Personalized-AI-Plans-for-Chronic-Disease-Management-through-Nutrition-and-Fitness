@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'food_page.dart'; // Import the third page
-import 'user_info.dart'; // Import the UserInfo model
+import 'food_page.dart';
+import 'user_info.dart';
 
 class GeneralInfoPage extends StatefulWidget {
   final String userId;
   final UserInfo userInfo;
 
-  const GeneralInfoPage({Key? key, required this.userId, required this.userInfo}) : super(key: key);
+  const GeneralInfoPage({
+    super.key,
+    required this.userId,
+    required this.userInfo,
+  });
 
   @override
   _GeneralInfoPageState createState() => _GeneralInfoPageState();
@@ -15,52 +20,154 @@ class GeneralInfoPage extends StatefulWidget {
 
 class _GeneralInfoPageState extends State<GeneralInfoPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
 
+  // These final values go to Firestore
   String? _selectedGender;
+  String? _selectedAge;
+  String? _selectedHeight;
+  String? _selectedWeight;
+
+  // Predefined lists
+  final List<String> ageList =
+  List.generate(86, (index) => (15 + index).toString());   // 15..100
+  final List<String> heightList =
+  List.generate(81, (index) => (120 + index).toString()); // 120..200
+  final List<String> weightList =
+  List.generate(151, (index) => (30 + index).toString()); // 30..180
+
+  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    // Pre-fill fields if data exists
-    _ageController.text = widget.userInfo.age ?? '';
-    _heightController.text = widget.userInfo.height ?? '';
-    _weightController.text = widget.userInfo.weight ?? '';
+
+    // Use existing userInfo or defaults
+    _selectedAge = widget.userInfo.age ?? '18';
+    _selectedHeight = widget.userInfo.height ?? '150';
+    _selectedWeight = widget.userInfo.weight ?? '50';
     _selectedGender = widget.userInfo.gender;
   }
 
+  /// Shows a bottom sheet with a CupertinoPicker.
+  ///   - [title] used at the top of the bottom sheet
+  ///   - [items] is the list of strings to pick from
+  ///   - [initialValue] is the currently selected item
+  ///   - [onDone] callback with the new selection
+  void _showNumberPicker({
+    required String title,
+    required List<String> items,
+    required String initialValue,
+    required ValueChanged<String> onDone,
+  }) {
+    final initialIndex = items.indexOf(initialValue);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        // We'll store a temporary selection so user can scroll freely
+        String tempSelected = initialValue;
+
+        return Container(
+          height: 300,
+          padding: const EdgeInsets.only(top: 16),
+          child: Column(
+            children: [
+              // Title Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // spacer
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  // Done button
+                  TextButton(
+                    onPressed: () {
+                      // Return the chosen value
+                      onDone(tempSelected);
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController:
+                  FixedExtentScrollController(initialItem: initialIndex),
+                  itemExtent: 36,
+                  onSelectedItemChanged: (index) {
+                    tempSelected = items[index];
+                  },
+                  children: items.map((value) {
+                    return Center(
+                      child: Text(
+                        value,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _goToNextPage() async {
+    if (_isSubmitting) return; // Prevent double presses
+    _isSubmitting = true;
+
+    // Check the form + gender
     if (_formKey.currentState!.validate() && _selectedGender != null) {
-      widget.userInfo.age = _ageController.text.trim();
-      widget.userInfo.height = _heightController.text.trim();
-      widget.userInfo.weight = _weightController.text.trim();
-      widget.userInfo.gender = _selectedGender;
+      // Save to userInfo
+      widget.userInfo
+        ..age = _selectedAge
+        ..height = _selectedHeight
+        ..weight = _selectedWeight
+        ..gender = _selectedGender;
 
       try {
-        // Save data to Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(widget.userId)
-            .set(widget.userInfo.toMap(), SetOptions(merge: true));
+            .set(
+          widget.userInfo.toMap(),
+          SetOptions(merge: true),
+        );
 
-        // Navigate to the next page
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FoodPage(userId: widget.userId, userInfo: widget.userInfo),
+            builder: (context) => FoodPage(
+              userId: widget.userId,
+              userInfo: widget.userInfo,
+            ),
           ),
-        );
+        ).then((_) => _isSubmitting = false);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save data: $e')),
         );
+        _isSubmitting = false;
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields correctly and select your gender')),
+        const SnackBar(
+          content: Text('Please fill all fields and select your gender'),
+        ),
       );
+      _isSubmitting = false;
     }
   }
 
@@ -78,8 +185,8 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF008080), // Teal
-                      Color(0xFF66BB6A), // Softer green
+                      Color(0xFF255744), // Teal
+                      Color(0xFF76D7C4), // Softer green
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -91,24 +198,29 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
                     style: TextStyle(
                       fontFamily: 'OfficialNICK',
                       color: Colors.white,
-                      fontSize: 42,
+                      fontSize: 45,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
             ),
+
+            // Back button
             Positioned(
               top: 16,
               left: 16,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white54,
+                  size: 26,
+                ),
+                onPressed: () => Navigator.pop(context),
               ),
             ),
-            // Page Content
+
+            // Main Content
             Column(
               children: [
                 const SizedBox(height: 200),
@@ -125,7 +237,6 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
                         child: Form(
                           key: _formKey,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               const Text(
                                 'Personal Information',
@@ -133,21 +244,29 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
                                 style: TextStyle(
                                   fontFamily: 'Raleway',
                                   fontSize: 22,
-                                  // fontWeight: FontWeight.bold,
                                   color: Colors.black87,
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              TextFormField(
-                                controller: _ageController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Age',
-                                  border: OutlineInputBorder(),
+                              const SizedBox(height: 24),
+
+                              // Age Row
+                              _buildSelectableRow(
+                                label: 'Age',
+                                value: _selectedAge ?? '',
+                                onTap: () => _showNumberPicker(
+                                  title: 'Select Age',
+                                  items: ageList,
+                                  initialValue: _selectedAge ?? '18',
+                                  onDone: (newVal) {
+                                    setState(() {
+                                      _selectedAge = newVal;
+                                    });
+                                  },
                                 ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) => value!.isEmpty ? 'Please enter your age' : null,
                               ),
                               const SizedBox(height: 16),
+
+                              // Gender Dropdown
                               DropdownButtonFormField<String>(
                                 decoration: const InputDecoration(
                                   labelText: 'Gender',
@@ -165,46 +284,68 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
                                 ],
                                 value: _selectedGender,
                                 onChanged: (value) {
-                                  setState(() {
-                                    _selectedGender = value;
-                                  });
+                                  setState(() => _selectedGender = value);
+                                },
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) {
+                                    return 'Select gender';
+                                  }
+                                  return null;
                                 },
                               ),
                               const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _heightController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Height (cm)',
-                                  border: OutlineInputBorder(),
+
+                              // Height Row
+                              _buildSelectableRow(
+                                label: 'Height (cm)',
+                                value: _selectedHeight ?? '',
+                                onTap: () => _showNumberPicker(
+                                  title: 'Select Height',
+                                  items: heightList,
+                                  initialValue: _selectedHeight ?? '150',
+                                  onDone: (newVal) {
+                                    setState(() {
+                                      _selectedHeight = newVal;
+                                    });
+                                  },
                                 ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) => value!.isEmpty ? 'Please enter your height' : null,
                               ),
                               const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _weightController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Weight (kg)',
-                                  border: OutlineInputBorder(),
+
+                              // Weight Row
+                              _buildSelectableRow(
+                                label: 'Weight (kg)',
+                                value: _selectedWeight ?? '',
+                                onTap: () => _showNumberPicker(
+                                  title: 'Select Weight',
+                                  items: weightList,
+                                  initialValue: _selectedWeight ?? '50',
+                                  onDone: (newVal) {
+                                    setState(() {
+                                      _selectedWeight = newVal;
+                                    });
+                                  },
                                 ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) => value!.isEmpty ? 'Please enter your weight' : null,
                               ),
-                              const SizedBox(height: 30),
-                              ElevatedButton(
-                                onPressed: _goToNextPage,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF40E0D0), // Turquoise
-                                  elevation: 10,
-                                  shadowColor: Colors.black.withOpacity(0.4),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                              const SizedBox(height: 24),
+
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _goToNextPage,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF40E0D0),
+                                    elevation: 10,
+                                    shadowColor: Colors.black.withOpacity(0.4),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 15),
                                   ),
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
-                                ),
-                                child: const Text(
-                                  'Next',
-                                  style: TextStyle(color: Colors.white, fontSize: 18),
+                                  child: const Text(
+                                    'Next',
+                                    style: TextStyle(color: Colors.white, fontSize: 18),
+                                  ),
                                 ),
                               ),
                             ],
@@ -221,6 +362,45 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
       ),
     );
   }
+
+  /// Reusable widget that shows label + chosen value,
+  /// and triggers the bottom sheet picker on tap.
+  Widget _buildSelectableRow({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              value.isEmpty ? 'Tap to select' : value,
+              style: TextStyle(
+                color: value.isEmpty ? Colors.grey : Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // Custom Clipper for the Header's Curved Design
@@ -230,10 +410,10 @@ class HeaderClipper extends CustomClipper<Path> {
     Path path = Path();
     path.lineTo(0, size.height - 50);
     path.quadraticBezierTo(
-      size.width / 2, size.height, // Control point
-      size.width, size.height - 50, // End at bottom-right
+      size.width / 2, size.height,
+      size.width, size.height - 50,
     );
-    path.lineTo(size.width, 0); // Top-right
+    path.lineTo(size.width, 0);
     path.close();
     return path;
   }

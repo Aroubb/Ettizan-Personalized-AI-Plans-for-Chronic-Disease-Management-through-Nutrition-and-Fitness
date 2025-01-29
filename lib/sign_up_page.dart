@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_page.dart'; // Import Home Page to navigate after successful sign-up
-import 'user_info_page.dart'; // Import User Info Page
+import 'package:customplans/health_page.dart';
+import 'package:customplans/user_info.dart' as custom;
+import 'login_page.dart';
+import 'health_page.dart';
+
 
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -28,25 +31,35 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     try {
-      // Create a new user with email and password
+      print("Attempting sign-up...");
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Update the display name with full name
-      await userCredential.user?.updateDisplayName(_fullNameController.text.trim());
-      await userCredential.user?.reload();
+      // Check if user is created
+      if (userCredential.user != null) {
+        print("User created: ${userCredential.user?.uid}");
 
-      // Navigate to the Home Page
-      Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (context) => UserInfoPage(userId: userCredential.user!.uid),
-  ),
-);
+        await userCredential.user?.updateDisplayName(_fullNameController.text.trim());
+        await userCredential.user?.reload();
 
+        custom.UserInfo userInfo = custom.UserInfo(fullName: _fullNameController.text.trim());
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HealthPage(
+              userId: userCredential.user!.uid,
+              userInfo: userInfo,
+            ),
+          ),
+        );
+      } else {
+        print("User creation failed");
+      }
     } catch (e) {
+      print("Sign-up failed: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign-up failed: $e')),
       );
@@ -56,160 +69,174 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          // Header
-          Stack(
-            children: [
-              Container(
-                height: 200,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF76D7C4), // Light green
-                      Color(0xFFA8E6CF), // Softer green
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+          ClipPath(
+            clipper: HeaderClipper(),
+            child: Container(
+              height: 300,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF255744), // Teal
+                    Color(0xFF76D7C4), // Softer green
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: const Center(
+                child: Text(
+                  'ETTIZAN',
+                  style: TextStyle(
+                    fontFamily: 'OfficialNICK',
+                    color: Colors.white,
+                    fontSize: 45,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              ClipPath(
-                clipper: HeaderClipper(),
-                child: Container(
-                  height: 200,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF008080), // Deeper green
-                        Color(0xFF66BB6A), // Softer green
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Create Account',
-                      style: TextStyle(
-                        fontFamily: 'WtfHorselandDemo', // Replace with your custom font if needed
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 35,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 35.0),
-            child: Text(
-              'Join Ettizan today!',
+          Positioned(
+            top: 200,
+            left: 20,
+            right: 20,
+            child: const Text(
+              'Welcome to Join Ettizan!',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 22,
-                color: Colors.black87,
+                fontFamily: 'Raleway',
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'MTF Base',
+                color: Colors.white60,
               ),
             ),
           ),
-          // Form Fields
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _fullNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  // Create Button with Shadow
-                  SizedBox(
-                    width: double.infinity, // Match the button width to the form fields
-                    child: ElevatedButton(
-                      onPressed: _signUp,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF40E0D0), // Turquoise color
-                        elevation: 10, // Shadow effect
-                        shadowColor: Colors.black.withOpacity(0.7), // Shadow color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: const Text(
-                        'Create',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+          Positioned(
+            top: 240,
+            left: 20,
+            right: 20,
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _fullNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Name',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 50),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context); // Navigate back to Login Page
-                    },
-                    child: Text.rich(
-                      TextSpan(
-                        text: 'Already have an account? ',
-                        style: const TextStyle(color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text: 'Login here',
-                            style: const TextStyle(
-                              color: Color(0xFF4CAF50),
-                              fontWeight: FontWeight.bold,
-                            ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _signUp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF40E0D0), // Turquoise
+                          elevation: 10,
+                          shadowColor: Colors.black.withOpacity(0.4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                        ],
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                        ),
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+          // Back Arrow Button
+          Positioned(
+            top: 40,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                  color: Colors.white54, size: 26
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          // Login Text
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 40), // Adjust padding
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()), // Navigate to Login Page
+                  );
+                },
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Already have an account? ',
+                    style: const TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Login here',
+                        style: const TextStyle(
+                          color: Color(0xFF4CAF50),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Developer Shortcut
+          //
         ],
       ),
     );
   }
 }
 
-// Custom Clipper for the Header's Curved Design
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 50);
     path.quadraticBezierTo(
-      size.width / 2, size.height,
-      size.width, size.height - 50,
+      size.width / 2, size.height, // Control point
+      size.width, size.height - 50, // End at bottom-right
     );
-    path.lineTo(size.width, 0);
+    path.lineTo(size.width, 0); // Top-right
     path.close();
     return path;
   }
@@ -217,3 +244,5 @@ class HeaderClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
+

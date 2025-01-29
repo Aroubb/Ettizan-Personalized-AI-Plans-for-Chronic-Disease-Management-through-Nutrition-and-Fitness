@@ -1,122 +1,197 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; // Import the Login Page
+import 'loading_screen.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // The animation will run for 3 seconds, but we won't auto-navigate after completion.
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..forward();
+
+    // COMMENT OUT or REMOVE any addStatusListener that auto-navigates:
+    // _controller.addStatusListener((status) {
+    //   if (status == AnimationStatus.completed) {
+    //     _goToLoadingScreen();
+    //   }
+    // });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // This function triggers a fade transition to the LoadingScreen
+  void _goToLoadingScreen() {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(seconds: 1),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return const LoadingScreen();
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Full-Page Gradient Background
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF008080), // Teal
-                  Color(0xFFE75480  ), // Light green
-                  Color(0xFF66BB6A), // Softer green
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-          // Circular Shape 1: Larger Circle on the Left
-          Positioned(
-            left: -100, // Move circle partially off-screen
-            top: MediaQuery.of(context).size.height * 0.2, // Position vertically
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white24, // Semi-transparent white
-              ),
-            ),
-          ),
-          // Circular Shape 2: Smaller Circle on the Bottom Right
-          Positioned(
-            right: -50, // Move circle partially off-screen
-            bottom: MediaQuery.of(context).size.height * 0.1, // Position vertically
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white30, // Slightly more transparent white
-              ),
-            ),
-          ),
-          // Transparent Pink Circle 1: Medium Circle at the Top Right
-          Positioned(
-            right: -70,
-            top: MediaQuery.of(context).size.height * 0.1,
-            child: Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFFFB6C1).withOpacity(0.3), // LightPink with transparency
-              ),
-            ),
-          ),
-          // Transparent Pink Circle 2: Small Circle in the Bottom Left
-          Positioned(
-            left: 20,
-            bottom: MediaQuery.of(context).size.height * 0.2,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFFFC0CB).withOpacity(0.3), // Pink with transparency
-              ),
-            ),
-          ),
-          // Content in the Center
+          // Background color
+          Container(color: const Color(0xFFEAE4DD)),
+
+          // Main content in center
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'ETTIZAN',
-                  style: TextStyle(
-                    fontFamily: 'Roboto', // Replace with your preferred font
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 48,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Personalized AI Plans for Chronic Disease Management\nthrough Nutrition and Fitness',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'MTF Base', // Replace with your preferred font
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-
+                // Logo with a ScaleTransition
+                ScaleTransition(
+                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                    CurvedAnimation(
+                      parent: _controller,
+                      curve: Curves.elasticOut,
                     ),
+                  ),
+                  child: const Image(
+                    image: AssetImage('images/Ettizan_logo_enhanced22.png'),
+                    width: 400,
+                    height: 260,
                   ),
                 ),
                 const SizedBox(height: 30),
-                IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward,
-                    color: Colors.white,
-                    size: 40,
+
+                // Animated text (ETTIZAN)
+                AnimatedOpacity(
+                  opacity: 1.0,
+                  duration: const Duration(seconds: 2),
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: _controller,
+                        curve: Curves.easeOut,
+                      ),
+                    ),
+                    child: const Text(
+                      'ETTIZAN',
+                      style: TextStyle(
+                        fontFamily: 'PTC55F',
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        letterSpacing: 6,
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginPage()),
-                    );
-                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Subtitle
+                AnimatedOpacity(
+                  opacity: 1.0,
+                  duration: const Duration(seconds: 2),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: const TextSpan(
+                        text: 'Personalized AI Plans\n',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'for ',
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Chronic Disease Management\n',
+                            style: TextStyle(
+                              color: Color(0xFF6D8D6A),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'through Nutrition and Fitness',
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+
+                // "Get Started" button => triggers fade transition to LoadingScreen
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFF74D1B6),
+                        Color(0xFF006E5B),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _goToLoadingScreen, // calls our fade transition
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.black.withOpacity(0.5),
+                    ),
+                    child: const Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

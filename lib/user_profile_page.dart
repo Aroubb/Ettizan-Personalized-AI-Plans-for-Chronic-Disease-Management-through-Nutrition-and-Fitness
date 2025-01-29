@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'edit_info_page.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  const UserProfilePage({super.key});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -17,8 +17,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Map<String, dynamic> userData = {
     'name': 'N/A',
     'email': 'N/A',
-    'healthCondition': 'N/A',
-    'foodPreferences': 'N/A',
+    'disease': 'N/A',
+    'foodPreference': 'N/A',
     'allergies': 'N/A',
     'height': 'N/A',
     'weight': 'N/A',
@@ -41,8 +41,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           userData = {
             'name': user.displayName ?? 'N/A',
             'email': user.email ?? 'N/A',
-            'healthCondition': data?['healthCondition'] ?? 'N/A',
-            'foodPreferences': data?['foodPreferences'] ?? 'N/A',
+            'disease': data?['disease'] ?? 'N/A',
+            'foodPreference': data?['foodPreference'] ?? 'N/A',
             'allergies': data?['allergies'] ?? 'N/A',
             'height': (data?['height'] ?? 'N/A').toString(),
             'weight': (data?['weight'] ?? 'N/A').toString(),
@@ -58,7 +58,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Header Section
           Container(
             height: 250,
             decoration: const BoxDecoration(
@@ -70,7 +69,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             child: Stack(
               children: [
-                // Wavy Background
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -95,15 +93,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                   ),
                 ),
-                // Profile Header
                 Positioned(
-                  top: MediaQuery.of(context).padding.top + 20,
+                  top: MediaQuery.of(context).padding.top + 30,
                   left: 16,
                   right: 16,
                   child: Column(
                     children: [
                       const CircleAvatar(
-                        radius: 50,
+                        radius: 40,
                         backgroundColor: Colors.white,
                         child: Icon(
                           Icons.person,
@@ -116,6 +113,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         userData['name'],
                         style: const TextStyle(
                           fontSize: 24,
+                          fontFamily: "Raleway",
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -131,7 +129,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ],
                   ),
                 ),
-                // Back Button
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 10,
                   left: 16,
@@ -144,7 +141,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                   ),
                 ),
-                // Edit Button
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 10,
                   right: 16,
@@ -161,7 +157,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                           ),
                         ).then((_) {
-                          _fetchUserData(); // Refresh data after editing
+                          _fetchUserData();
                         });
                       },
                     ),
@@ -170,16 +166,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ],
             ),
           ),
-          // Main Content Section
           Padding(
             padding: const EdgeInsets.only(top: 250),
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Profile Information
                   const SizedBox(height: 20),
-                  _buildProfileCard('Health Condition', userData['healthCondition']),
-                  _buildProfileCard('Food Preferences', userData['foodPreferences']),
+                  _buildProfileCard('Health Condition', userData['disease']),
+                  _buildProfileCard('Food Preferences', userData['foodPreference']),
                   _buildProfileCard('Allergies', userData['allergies']),
                   _buildProfileCard('Height (cm)', userData['height']),
                   _buildProfileCard('Weight (kg)', userData['weight']),
@@ -231,7 +225,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 }
 
-// Custom Clipper for Wave Background
 class WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -37,6 +40,18 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
+  flutter_gemini: ^3.0.0
+  gemini: ^2.1.1
+  fl_chart: ^0.69.2
+  syncfusion_flutter_charts: ^20.4.48
+  provider: ^6.0.3
+  chat_gpt_flutter: ^1.0.8 
+  flutter_dotenv: ^5.2.1
+  http: ^1.3.0
+  url_launcher: ^6.0.10
+
+
+
 
 
 dev_dependencies:
@@ -49,16 +64,21 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  intl_utils: ^2.0.0 # Add this package for generating localization files
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  
 
   assets:
   - images/Ettizan_logo_enhanced22.png
@@ -69,7 +89,57 @@ flutter:
   - images/yoga.jpg
   - images/yogurt.jpg
   - images/smoothie1.jpg
-  - images/yogurt2.jpg
+  - images/yogurtWithCinnamon.jpg
+  - images/RunningPerson.gif
+  - images/Nutrtion.gif
+  - images/labneh.jpg
+  - images/Chicken-Kabsa.jpg
+  - images/LentilSoup.jpg
+  - images/AppleWithAlmondButter.jpg
+  - images/oatmeal.jpg
+  - images/fishWithBbrownRice.jpg
+  - images/VegetableSoup.jpg
+  - images/porridge.jpeg
+  - images/Gareesh.jpeg
+  - images/snackk.jpg
+  - images/Breakfastt.jpeg
+  - images/roastedSalmonWithVegetables.jpeg
+  - images/checkenAndVegetabls.jpg
+  - images/nutsAndSeeds.webp
+  - images/chickenSaladAndWholeWheatPita.webp
+  - images/YogurtAndBluberry.jpeg
+  - images/yogurt.jpg
+  - images/vegetabls.jpeg
+  - images/potatos.jpeg
+  - images/EggplanFattehWithYogurt.jpg
+  - images/Margoug.jpg
+  - images/Goursan.png
+  - images/LabanOrMilk with Dates.jpg
+  - images/TabboulehSalad.jpg
+  - images/Foul.jpg
+  - images/labneh with olive oil and za'atar.webp
+  - images/Grilled liver.jpg
+  - images/Pumpkin soup with vegetables and chicken.jpg
+  - images/Hummus with tahini.jpg
+  - images/Cottage-Cheese-with-Tomatoes-and-Pepitas.jpg
+  - images/Chicken Saliq .jpg
+  - images/Yogurt cucumber salad.jpg
+  - images/Boiled eggs with whole-grain bread and cucumber.jpeg
+  - images/Machkhool.jpg
+  - images/Oat soup.png
+  - images/Mathloutha.jpeg
+  - images/Fattoush salad.jpg
+  - images/Grilled fish.jpg
+  - images/Oats with low-fat milk and a sprinkle of cinnamon..jpg
+  - images/scrambled-eggs.jpg
+  - images/Rice.jpg
+  - images/pasta.webp
+  - images/Lunch.png
+  - images/Dinner.jpg
+  - images/roasted chickpeas.jpg
+  - images/AlmondStuffDates.png.webp
+  - images/Exercises/walking.gif
+  - images/congrats.gif
 
 
   fonts:
@@ -113,17 +183,17 @@ flutter:
 
 
 
-  #    - family: JosefinSans
-#      fonts:
-#        - asset: fonts/JosefinSans-SemiBold.ttf
+    # - family: JosefinSans
+    #   fonts:
+    #     - asset: fonts/JosefinSans-SemiBold.ttf
 
-#    - family: Alkia
-#      fonts:
-#        - asset: fonts/Alkia.ttf
-#
-#    - family: Crosever
-#      fonts:
-#        - asset: fonts/Crosever-800rM.ttf
+    - family: Alkia
+      fonts:
+        - asset: fonts/Alkia.ttf
+
+    - family: Crosever
+      fonts:
+        - asset: fonts/Crosever-8OOrM.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

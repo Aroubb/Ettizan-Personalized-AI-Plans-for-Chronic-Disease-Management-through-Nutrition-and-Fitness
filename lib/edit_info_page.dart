@@ -5,7 +5,8 @@ class EditInfoPage extends StatefulWidget {
   final String userId;
   final Map<String, dynamic> userData;
 
-  const EditInfoPage({Key? key, required this.userId, required this.userData}) : super(key: key);
+  const EditInfoPage({Key? key, required this.userId, required this.userData})
+      : super(key: key);
 
   @override
   State<EditInfoPage> createState() => _EditInfoPageState();
@@ -13,12 +14,11 @@ class EditInfoPage extends StatefulWidget {
 
 class _EditInfoPageState extends State<EditInfoPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final _formKey = GlobalKey<FormState>();
 
   late String goal;
-  late String healthCondition;
-  late String foodPreferences;
+  late String disease;
+  late String foodPreference;
   late String allergies;
   late double height;
   late double weight;
@@ -27,8 +27,8 @@ class _EditInfoPageState extends State<EditInfoPage> {
   void initState() {
     super.initState();
     goal = widget.userData['goal'] ?? 'Maintain Weight';
-    healthCondition = widget.userData['healthCondition'] ?? 'N/A';
-    foodPreferences = widget.userData['foodPreferences'] ?? 'N/A';
+    disease = widget.userData['disease'] ?? 'N/A';
+    foodPreference = widget.userData['foodPreference'] ?? 'N/A';
     allergies = widget.userData['allergies'] ?? 'N/A';
     height = double.tryParse(widget.userData['height'] ?? '0.0') ?? 0.0;
     weight = double.tryParse(widget.userData['weight'] ?? '0.0') ?? 0.0;
@@ -37,162 +37,388 @@ class _EditInfoPageState extends State<EditInfoPage> {
   Future<void> _saveChanges() async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
-      await _firestore.collection('users').doc(widget.userId).update({
-        'goal': goal,
-        'healthCondition': healthCondition,
-        'foodPreferences': foodPreferences,
-        'allergies': allergies,
-        'height': height,
-        'weight': weight,
-      });
-      Navigator.pop(context);
+      try {
+        await _firestore.collection('users').doc(widget.userId).update({
+          'goal': goal,
+          'disease': disease,
+          'foodPreference': foodPreference,
+          'allergies': allergies,  // may be empty
+          'height': height,
+          'weight': weight,
+        });
+        Navigator.pop(context); // Navigate back after saving changes
+      } catch (e) {
+        // Handle errors (e.g., connection issues, Firebase errors)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving changes: $e')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-        backgroundColor: Colors.teal,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveChanges,
+      body: Stack(
+        children: [
+          // Gradient background and wave effect
+          Container(
+            height: 250,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Wave background
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ClipPath(
+                    clipper: WaveClipper(),
+                    child: Container(
+                      height: 100,
+                      color: const Color(0xFF008080).withOpacity(0.3),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: ClipPath(
+                    clipper: WaveClipper(),
+                    child: Container(
+                      height: 80,
+                      color: const Color(0xFF008080).withOpacity(0.5),
+                    ),
+                  ),
+                ),
+                // Avatar and Header Text
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 30,
+                  left: 16,
+                  right: 16,
+                  child: Column(
+                    children: const [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.teal,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Edit Information',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: "Raleway",
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Back and Save Buttons
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  left: 16,
+                  child: SafeArea(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 28),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  right: 16,
+                  child: SafeArea(
+                    child: IconButton(
+                      icon:
+                      const Icon(Icons.save, color: Colors.white, size: 28),
+                      onPressed: _saveChanges,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Form content
+          Padding(
+            padding: const EdgeInsets.only(top: 250), // Below the header
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      _buildDropdownField(
+                        label: 'Goal',
+                        value: goal,
+                        options: ['Lose Weight', 'Maintain Weight', 'Gain Weight'],
+                        onChanged: (value) => setState(() => goal = value!),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildDropdownField(
+                        label: 'Disease',
+                        value: disease,
+                        options: [
+                          'N/A',
+                          'Diabetes',
+                          'Hypertension',
+                          'High Cholesterol'
+                        ],
+                        onChanged: (value) => setState(() => disease = value!),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildDropdownField(
+                        label: 'Food Preferences',
+                        value: foodPreference,
+                        options: [
+                          'N/A',
+                          'Vegetarian',
+                          'Gluten-Free',
+                          'No Preferences'
+                        ],
+                        onChanged: (value) =>
+                            setState(() => foodPreference = value!),
+                      ),
+                      const SizedBox(height: 10),
+                      // Allergies is now optional
+                      _buildTextField(
+                        label: 'Allergies',
+                        initialValue: allergies,
+                        onSaved: (value) => allergies = value!,
+                        isOptional: true,  // <--- pass "true" here
+                      ),
+                      const SizedBox(height: 10),
+                      _buildNumericField(
+                        label: 'Height (cm)',
+                        initialValue: height.toString(),
+                        onSaved: (value) => height = double.parse(value!),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildNumericField(
+                        label: 'Weight (kg)',
+                        initialValue: weight.toString(),
+                        onSaved: (value) => weight = double.parse(value!),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      body: Padding(
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String value,
+    required List<String> options,
+    required void Function(String?) onChanged,
+  }) {
+    // Ensure value is in the options list, else default to the first option
+    if (!options.contains(value)) {
+      value = options[0];
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              _buildDropdownField(
-                'Goal',
-                goal,
-                ['Lose Weight', 'Gain Weight', 'Maintain Weight'],
-                (value) => setState(() => goal = value!),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.teal,
+                ),
               ),
-              const SizedBox(height: 10),
-              _buildDropdownField(
-                'Health Condition',
-                healthCondition,
-                ['N/A', 'Diabetes', 'Hypertension', 'Cholesterol'],
-                (value) => setState(() => healthCondition = value!),
+            ),
+            Expanded(
+              flex: 3,
+              child: DropdownButtonFormField<String>(
+                value: value,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+                items: options.map((option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a valid option';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 10),
-              _buildDropdownField(
-                'Food Preferences',
-                foodPreferences,
-                ['N/A', 'Vegetarian', 'Vegan', 'Keto', 'Low Carb', 'Paleo'],
-                (value) => setState(() => foodPreferences = value!),
-              ),
-              const SizedBox(height: 10),
-              _buildTextField(
-                'Allergies',
-                allergies,
-                (value) => setState(() => allergies = value),
-              ),
-              const SizedBox(height: 10),
-              _buildNumericField(
-                'Height (cm)',
-                height.toString(),
-                (value) => setState(() => height = double.parse(value)),
-              ),
-              const SizedBox(height: 10),
-              _buildNumericField(
-                'Weight (kg)',
-                weight.toString(),
-                (value) => setState(() => weight = double.parse(value)),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDropdownField(
-    String label,
-    String value,
-    List<String> options,
-    void Function(String?) onChanged,
-  ) {
+  Widget _buildTextField({
+    required String label,
+    required String initialValue,
+    required void Function(String?) onSaved,
+    bool isOptional = false,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: DropdownButtonFormField<String>(
-          value: value,
-          decoration: InputDecoration(
-            labelText: label,
-            border: InputBorder.none,
-          ),
-          items: options.map((option) {
-            return DropdownMenuItem(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          validator: (value) => value == null || value.isEmpty ? 'Please select $label' : null,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.teal,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: TextFormField(
+                initialValue: initialValue,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+                onSaved: onSaved,
+                validator: (value) {
+                  // If this field is optional, skip the "cannot be empty" check.
+                  if (!isOptional && (value == null || value.isEmpty)) {
+                    return 'This field cannot be empty';
+                  }
+                  return null; // Passes validation
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    String initialValue,
-    void Function(String) onSaved,
-  ) {
+  /// Checks if the user input is within valid ranges for Height or Weight.
+  Widget _buildNumericField({
+    required String label,
+    required String initialValue,
+    required void Function(String?) onSaved,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: TextFormField(
-          initialValue: initialValue,
-          decoration: InputDecoration(
-            labelText: label,
-            border: InputBorder.none,
-          ),
-          onSaved: (value) => onSaved(value ?? ''),
-          validator: (value) => value == null || value.isEmpty ? 'Please enter $label' : null,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.teal,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: TextFormField(
+                initialValue: initialValue,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+                onSaved: onSaved,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'This field cannot be empty';
+                  }
+
+                  final number = double.tryParse(value);
+                  if (number == null) {
+                    return 'Please enter a valid number';
+                  }
+
+                  // Range checks for Height or Weight
+                  if (label == 'Height (cm)') {
+                    if (number < 120 || number > 200) {
+                      return 'Out of range';
+                    }
+                  } else if (label == 'Weight (kg)') {
+                    if (number < 30 || number > 180) {
+                      return 'Out of range';
+                    }
+                  }
+
+                  return null; // Passes validation
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+}
+
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 20);
+    path.quadraticBezierTo(
+      size.width / 4,
+      size.height,
+      size.width / 2,
+      size.height - 20,
+    );
+    path.quadraticBezierTo(
+      3 * size.width / 4,
+      size.height - 40,
+      size.width,
+      size.height - 20,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
   }
 
-  Widget _buildNumericField(
-    String label,
-    String initialValue,
-    void Function(String) onSaved,
-  ) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: TextFormField(
-          initialValue: initialValue,
-          decoration: InputDecoration(
-            labelText: label,
-            border: InputBorder.none,
-          ),
-          keyboardType: TextInputType.number,
-          onSaved: (value) => onSaved(value ?? '0'),
-          validator: (value) {
-            final numValue = double.tryParse(value ?? '');
-            return numValue == null ? 'Please enter a valid $label' : null;
-          },
-        ),
-      ),
-    );
-  }
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

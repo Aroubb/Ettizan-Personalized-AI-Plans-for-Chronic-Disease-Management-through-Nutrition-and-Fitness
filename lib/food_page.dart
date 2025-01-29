@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'home_page.dart'; // Import Home Page
-import 'user_info.dart'; // Import UserInfo model
+import 'home_page.dart';
+import 'user_info.dart';
 
 class FoodPage extends StatefulWidget {
   final String userId;
@@ -14,22 +14,33 @@ class FoodPage extends StatefulWidget {
 }
 
 class _FoodPageState extends State<FoodPage> {
-  final List<String> _foodPreferences = ['Vegetarian', 'Vegan', 'Gluten-Free', 'No Preferences'];
+  final List<String> _foodPreferences = [
+    'Vegetarian',
+    'Vegan',
+    'Gluten-Free',
+    'No Preferences',
+  ];
   final TextEditingController _allergyController = TextEditingController();
-
   String? _selectedFoodPreference;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void _submitUserInfo() async {
+  bool _isSubmitting = false;
+
+  Future<void> _submitUserInfo() async {
+    if (_isSubmitting) return;
+
     if (_selectedFoodPreference != null) {
+      setState(() => _isSubmitting = true);
+
       widget.userInfo.foodPreference = _selectedFoodPreference;
       widget.userInfo.allergies = _allergyController.text.trim();
 
       try {
-        // Save user data to Firestore
-        await _firestore.collection('users').doc(widget.userId).set(widget.userInfo.toMap());
+        await _firestore
+            .collection('users')
+            .doc(widget.userId)
+            .set(widget.userInfo.toMap(), SetOptions(merge: true));
 
-        // Navigate to Home Page
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -38,6 +49,8 @@ class _FoodPageState extends State<FoodPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving data: $e')),
         );
+      } finally {
+        setState(() => _isSubmitting = false);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,8 +73,8 @@ class _FoodPageState extends State<FoodPage> {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF008080), // Teal
-                      Color(0xFF66BB6A), // Softer green
+                      Color(0xFF255744), // Teal
+                      Color(0xFF76D7C4), // Softer green
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -73,7 +86,7 @@ class _FoodPageState extends State<FoodPage> {
                     style: TextStyle(
                       fontFamily: 'OfficialNICK',
                       color: Colors.white,
-                      fontSize: 42,
+                      fontSize: 45,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -84,7 +97,7 @@ class _FoodPageState extends State<FoodPage> {
               top: 16,
               left: 16,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                icon: const Icon(Icons.arrow_back, color: Colors.white54, size: 26),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -105,27 +118,36 @@ class _FoodPageState extends State<FoodPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Text(
                               'Food Preferences',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontFamily: 'Raleway',
-                                fontSize: 20,
-                                // fontWeight: FontWeight.bold,
+                                fontSize: 22,
                                 color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Help us tailor your experience by providing your dietary information.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Raleway',
+                                fontSize: 16,
+                                color: Colors.black54,
                               ),
                             ),
                             const SizedBox(height: 20),
                             DropdownButtonFormField<String>(
                               decoration: InputDecoration(
                                 labelText: 'Select Your Food Preference',
-                                labelStyle: const TextStyle(color: Colors.black54),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
+                                // filled: true,
+                                // fillColor: Colors.grey[100],
                               ),
                               items: _foodPreferences.map((preference) {
                                 return DropdownMenuItem<String>(
@@ -148,29 +170,36 @@ class _FoodPageState extends State<FoodPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
+                                // filled: true,
+                                // fillColor: Colors.grey[100],
                               ),
                               maxLines: 3,
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 30),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _submitUserInfo,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF40E0D0), // Turquoise
-                                  elevation: 10,
-                                  shadowColor: Colors.black.withOpacity(0.4),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                            ElevatedButton(
+                              onPressed: _isSubmitting ? null : _submitUserInfo,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isSubmitting
+                                    ? Colors.grey
+                                    : const Color(0xFF40E0D0),
+                                elevation: 10,
+                                shadowColor: Colors.black.withOpacity(0.4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: const Text(
-                                  'Submit',
-                                  style: TextStyle(color: Colors.white, fontSize: 18),
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 15),
+                              ),
+                              child: _isSubmitting
+                                  ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                                  : const Text(
+                                'Submit',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
@@ -189,7 +218,6 @@ class _FoodPageState extends State<FoodPage> {
   }
 }
 
-// Custom Clipper for the Header's Curved Design
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
