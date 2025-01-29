@@ -22,12 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     )..forward();
 
-    // COMMENT OUT or REMOVE any addStatusListener that auto-navigates:
-    // _controller.addStatusListener((status) {
-    //   if (status == AnimationStatus.completed) {
-    //     _goToLoadingScreen();
-    //   }
-    // });
+
   }
 
   @override

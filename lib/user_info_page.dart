@@ -14,9 +14,14 @@ class UserInfoPage extends StatefulWidget {
 class _UserInfoPageState extends State<UserInfoPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final List<String> _diseases = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Arthritis', 'Asthma'];
-  
-    
+  final List<String> _diseases = [
+    'Diabetes',
+    'Hypertension',
+    'High Cholesterol',
+    'Arthritis',
+    'Asthma'
+  ];
+
   final List<String> _goals = ['Lose Weight', 'Maintain Weight', 'Gain Weight'];
   final List<String> _foodPreferences = [
     'Vegetarian',
@@ -44,7 +49,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
         _selectedPreference != null) {
       try {
         await _firestore.collection('users').doc(widget.userId).set({
-          
           'age': int.tryParse(_ageController.text.trim()),
           'height': double.tryParse(_heightController.text.trim()),
           'weight': double.tryParse(_weightController.text.trim()),
@@ -122,27 +126,31 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    
                     const SizedBox(height: 15),
                     TextFormField(
                       controller: _ageController,
                       decoration: const InputDecoration(labelText: 'Age'),
                       keyboardType: TextInputType.number,
-                      validator: (value) => value!.isEmpty ? 'Please enter your age' : null,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter your age' : null,
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
                       controller: _heightController,
-                      decoration: const InputDecoration(labelText: 'Height (cm)'),
+                      decoration:
+                          const InputDecoration(labelText: 'Height (cm)'),
                       keyboardType: TextInputType.number,
-                      validator: (value) => value!.isEmpty ? 'Please enter your height' : null,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter your height' : null,
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
                       controller: _weightController,
-                      decoration: const InputDecoration(labelText: 'Weight (kg)'),
+                      decoration:
+                          const InputDecoration(labelText: 'Weight (kg)'),
                       keyboardType: TextInputType.number,
-                      validator: (value) => value!.isEmpty ? 'Please enter your weight' : null,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter your weight' : null,
                     ),
                     const SizedBox(height: 15),
                     DropdownButtonFormField<String>(
@@ -159,7 +167,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           _selectedDisease = value;
                         });
                       },
-                      validator: (value) => value == null ? 'Please select a disease' : null,
+                      validator: (value) =>
+                          value == null ? 'Please select a disease' : null,
                     ),
                     const SizedBox(height: 15),
                     DropdownButtonFormField<String>(
@@ -176,11 +185,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           _selectedGoal = value;
                         });
                       },
-                      validator: (value) => value == null ? 'Please select a goal' : null,
+                      validator: (value) =>
+                          value == null ? 'Please select a goal' : null,
                     ),
                     const SizedBox(height: 15),
                     DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(labelText: 'Food Preference'),
+                      decoration:
+                          const InputDecoration(labelText: 'Food Preference'),
                       items: _foodPreferences
                           .map((preference) => DropdownMenuItem<String>(
                                 value: preference,
@@ -193,7 +204,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           _selectedPreference = value;
                         });
                       },
-                      validator: (value) => value == null ? 'Please select a preference' : null,
+                      validator: (value) =>
+                          value == null ? 'Please select a preference' : null,
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
@@ -204,27 +216,27 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                   SizedBox(
-  width: double.infinity,
-  child: ElevatedButton(
-    onPressed: _submitUserInfo,
-      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF40E0D0), // Turquoise color
-                        elevation: 10, // Shadow effect
-                        shadowColor: Colors.black.withOpacity(0.7), // Shadow color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _submitUserInfo,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFF40E0D0), // Turquoise color
+                          elevation: 10, // Shadow effect
+                          shadowColor:
+                              Colors.black.withOpacity(0.7), // Shadow color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: const Text(
-                        'Submet',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                        child: const Text(
+                          'Submet',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-
-
                   ],
                 ),
               ),
@@ -241,7 +253,8 @@ class HeaderClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 50);
-    path.quadraticBezierTo(size.width / 2, size.height, size.width, size.height - 50);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 50);
     path.lineTo(size.width, 0);
     path.close();
     return path;

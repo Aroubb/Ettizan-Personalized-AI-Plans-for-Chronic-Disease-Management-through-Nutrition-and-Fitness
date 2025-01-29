@@ -78,45 +78,7 @@ class _ExerciseState extends State<Exercise> {
       : _completedExercises.where((completed) => completed).length /
           _mainWorkout.length;
 
-  // Update completion status of an exercise
-  // void _updateCompletionStatus(int index, bool value) {
-  //   setState(() {
-  //     _completedExercises[index] = value;
-  //     _updateCaloriesBurnt();
-  //   });
-  // }
 
-  // Method to calculate calories burnt for warm-up, main workout, and cool-down
-  // void _updateCaloriesBurnt() {
-  //   _totalCaloriesBurnt = 0.0;
-
-  //   // Calculate calories for warm-up
-  //   _totalCaloriesBurnt += _calculateCalories(_warmUp);
-
-  //   // Calculate calories for main workout
-  //   for (var exercise in _mainWorkout) {
-  //     _totalCaloriesBurnt += exercise['calories_burned'] ?? 0.0;
-  //   }
-
-  //   // Calculate calories for cool-down
-  //   _totalCaloriesBurnt += _calculateCalories(_coolDown);
-
-  //   // Update the pie chart or any UI element that needs the updated calories
-  //   setState(() {});
-  // }
-
-  // Helper method to calculate calories for warm-up or cool-down activities
-  // double _calculateCalories(List<String> activities) {
-  //   double calories = 0.0;
-  //   for (var activity in activities) {
-  //     // Parse calories burned for each activity (assumes the string format includes calories burned)
-  //     final match = RegExp(r"(\d+(\.\d+)?)\s*calories").firstMatch(activity);
-  //     if (match != null) {
-  //       calories += double.tryParse(match.group(1) ?? '0') ?? 0.0;
-  //     }
-  //   }
-  //   return calories;
-  // }
 
   // Fetch existing exercise plan
   Future<bool> _fetchExistingExercisePlan() async {
@@ -861,18 +823,7 @@ Return the response as a JSON object with the following structure:
           'completed': isCompleted,
         });
       }
-      // else {
-      //   // If no document found, create a new one with the calories values
-      //   await _firestore
-      //       .collection('exercisePlans')
-      //       .doc(user?.uid)
-      //       .collection('dailyWorkouts')
-      //       .add({
-      //     'totalCalories': totalCalories,
-      //     'totalCaloriesBurnt': totalCaloriesBurnt,
-      //     'timestamp': FieldValue.serverTimestamp(), // Ensure timestamp is added
-      //   });
-      // }
+
     } catch (e) {
       print("Error updating calories in Firestore: $e, no document found");
     }
@@ -894,11 +845,7 @@ Return the response as a JSON object with the following structure:
         _totalCalories += exerciseCalories;
       }
 
-      // // Update ProgressProvider with the new calorie values
-      // Provider.of<ProgressProvider>(context, listen: false).(
-      //   totalCalories: _totalCalories,
-      //   totalCaloriesBurnt: _totalCaloriesBurnt,
-      // );
+
     });
 
     // Update Firestore after the change
@@ -1163,140 +1110,6 @@ Return the response as a JSON object with the following structure:
     );
   }
 
-// // Updated method to mark a section as complete
-// void _markSectionAsCompleted(List<Map<String, dynamic>> exercises) {
-//   double sectionCalories = exercises.fold<double>(
-//     0.0,
-//     (sum, exercise) => sum + (exercise["calories_burned"] ?? 0.0).toDouble(),
-//   );
-
-//   setState(() {
-//     // Ensure calories don't exceed the available total
-//     if (sectionCalories > _totalCalories) {
-//       sectionCalories = _totalCalories;
-//     }
-
-//     // Update calories
-//     _totalCaloriesBurnt += sectionCalories;
-//     _totalCalories -= sectionCalories;
-
-//     // Mark each exercise as completed
-//     for (var exercise in exercises) {
-//       exercise["completed"] = true;
-//     }
-
-//     // Check if all exercises are completed
-//     if (_totalCalories == 0) {
-//       _isWorkoutCompleted = true;
-//       showDialog(
-//         context: context,
-//         builder: (BuildContext context) {
-//           return AlertDialog(
-//             title: const Text('Congratulations!'),
-//             content: const Text('You have completed your exercise plan for today.'),
-//             actions: <Widget>[
-//               TextButton(
-//                 onPressed: () {
-//                   Navigator.of(context).pop();
-//                 },
-//                 child: const Text('OK'),
-//               ),
-//             ],
-//           );
-//         },
-//       );
-//     }
-//   });
-// }
-
-  // Method for building the main workout section
-  // Method for building the main workout section
-  // Method for building the main workout section
-  // Widget _buildMainWorkoutSection() {
-  //   return Card(
-  //     elevation: 4,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //     margin: const EdgeInsets.symmetric(vertical: 8),
-  //     child: ExpansionTile(
-  //       leading: const Icon(Icons.fitness_center, color: Colors.teal),
-  //       title: const Text(
-  //         "Main Workout",
-  //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //       ),
-  //       trailing: Row(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           const Icon(Icons.arrow_drop_down, color: Colors.teal),
-  //           // Regenerate button
-  //           IconButton(
-  //             onPressed: _isLoading
-  //                 ? null
-  //                 : () async {
-  //                     final feedback =
-  //                         await _showFeedbackDialog(context, "Main Workout");
-  //                     await _generateExercisePlan(
-  //                         exerciseType: "Main Workout", feedback: feedback);
-  //                   },
-  //             icon: const Icon(Icons.refresh, color: Colors.teal),
-  //             tooltip: 'Regenerate Main Workout',
-  //           ),
-  //         ],
-  //       ),
-  //       childrenPadding:
-  //           const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-  //       children: [
-  //         ..._mainWorkout.isEmpty
-  //             ? [const Text("No exercises available.")]
-  //             : _mainWorkout.map((workout) {
-  //                 return ExpansionTile(
-  //                   leading:
-  //                       const Icon(Icons.fitness_center, color: Colors.teal),
-  //                   title: Text(
-  //                     workout["exercise"] ?? "Unknown Exercise",
-  //                     style: const TextStyle(fontWeight: FontWeight.w600),
-  //                   ),
-  //                   subtitle: Text(
-  //                     "Sets: ${workout["sets"]} | Reps: ${workout["repetitions"]} | Calories Burned: ${workout["calories_burned"] ?? "N/A"}",
-  //                   ),
-  //                   children: [
-  //                     Padding(
-  //                       padding: const EdgeInsets.all(8.0),
-  //                       child: Text(
-  //                         workout["description"] ?? "No description available.",
-  //                       ),
-  //                     ),
-  //                     ElevatedButton(
-  //                       onPressed: () {
-  //                         // Mark individual exercise as completed
-  //                         _updateCaloriesBurned(
-  //                             (workout["calories_burned"] ?? 0.0).toDouble());
-  //                         _updateCompletionStatus(
-  //                             _mainWorkout.indexOf(workout), true);
-  //                       },
-  //                       child: const Text('Complete Exercise'),
-  //                     ),
-  //                   ],
-  //                 );
-  //               }).toList(),
-  //         const SizedBox(height: 16),
-  //         ElevatedButton(
-  //           onPressed: () {
-  //             // Mark entire workout as completed
-  //             _markWorkoutAsCompleted();
-  //           },
-  //           child: Row(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: const [
-  //               Icon(Icons.check, size: 24), // Check icon
-  //               SizedBox(width: 8), // Add some space between the icon and text
-  //               Text('Complete Main Workout'),
-  //             ],
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
 // Method to mark the entire workout as complete
   void _markWorkoutAsCompleted() async {
@@ -1374,75 +1187,6 @@ Return the response as a JSON object with the following structure:
     }
   }
 
-// // Method to update the total calories burned
-//   void _updateCaloriesBurned(double calories) async {
-//     if (calories <= 0) {
-//       print('Invalid calorie value. Calories must be positive.');
-//       return;
-//     }
-
-//     final user = _auth.currentUser; // Ensure the user is logged in
-//     if (user == null) {
-//       print('No user is logged in. Cannot update calories.');
-//       return;
-//     }
-
-//     try {
-//       // Fetch the most recent workout document
-//       final querySnapshot = await _firestore
-//           .collection('exercisePlans')
-//           .doc(user.uid)
-//           .collection('dailyWorkouts')
-//           .orderBy('timestamp', descending: true)
-//           .limit(1)
-//           .get();
-
-//       if (querySnapshot.docs.isNotEmpty) {
-//         final doc = querySnapshot.docs.first;
-
-//         setState(() {
-//           if (_totalCalories == 0) {
-//             // Display congratulatory dialog to the user
-//             showDialog(
-//               context: context,
-//               builder: (BuildContext context) {
-//                 return AlertDialog(
-//                   title: Text('Congratulations!'),
-//                   content:
-//                       Text('You have completed your exercise plan for today.'),
-//                   actions: <Widget>[
-//                     TextButton(
-//                       onPressed: () {
-//                         Navigator.of(context).pop(); // Close the dialog
-//                       },
-//                       child: Text('OK'),
-//                     ),
-//                   ],
-//                 );
-//               },
-//             );
-//           } else {
-//             _totalCaloriesBurnt += calories; // Increment burnt calories
-//             _totalCalories -= calories; // Decrement remaining calories
-//           }
-//         });
-
-//         // Check if the total calories is 0, and show a congratulatory message
-
-//         // Update Firestore with the new totals
-//         await doc.reference.update({
-//           'totalCaloriesBurnt': _totalCaloriesBurnt,
-//           'totalCalories': _totalCalories,
-//         });
-
-//         print('Calories updated successfully in Firestore.');
-//       } else {
-//         print('No recent workout document found to update calories.');
-//       }
-//     } catch (e) {
-//       print('Error updating calories in Firestore: $e');
-//     }
-//   }
 
 // Method to update completion status of an exercise
   void _updateCompletionStatus(int index, bool value) {
