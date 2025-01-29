@@ -3,21 +3,21 @@
 ![Ettizan Logo](images/Ettizan_logo_enhanced22.png)  
 
 ## 📌 About Ettizan  
-Ettizan is a personalized AI-powered mobile application designed to assist individuals in managing chronic diseases through customized nutrition and fitness plans. By leveraging advanced AI and machine learning, the application analyzes user-specific health data to provide tailored recommendations, ensuring a more effective and user-friendly experience.
+Ettizan is a personalized AI-powered mobile application designed to assist individuals in managing chronic diseases through customized nutrition and fitness plans. By using advanced AI, the application analyzes user-specific health data to provide tailored recommendations, ensuring a more effective and user-friendly experience.
 
 ## 🎯 Key Features  
-- **Personalized Diet Plans** – AI-generated meal recommendations based on health conditions and dietary preferences.  
-- **Custom Fitness Programs** – Exercise routines designed to fit users' health goals and fitness levels.  
-- **Health Tracking** – Monitor key metrics such as weight, activity levels, and dietary habits.  
+- **Personalized Nutrition Plans** – AI-generated meal recommendations based on health conditions and dietary preferences.  
+- **Custom Exercise Plans** – Exercise routines designed to fit users' health goals and fitness levels.  
+- **Progress Tracking** – Monitor Daily progress.  
 - **User-Friendly Interface** – Built with Flutter for seamless navigation.  
 - **Secure Data Management** – Firebase integration ensures secure and efficient storage.  
-- **Engagement & Notifications** – Timely reminders and motivational content to enhance adherence to health plans.  
+ 
 
 ## 🛠️ Technologies Used  
 - **Frontend:** Flutter  
 - **Backend & Database:** Firebase  
-- **AI & Machine Learning:** Python, TensorFlow, Scikit-learn  
-- **Cloud & Deployment:** Firebase Cloud Functions, Google Cloud  
+- **AI:** Gemini
+
 
 ## 🏗️ Project Setup  
 
