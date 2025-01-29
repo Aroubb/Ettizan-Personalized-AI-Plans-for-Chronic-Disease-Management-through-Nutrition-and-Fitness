@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'login_page.dart';
 import 'user_profile_page.dart';
 import 'nutritionPlans_page.dart';
-import 'exercise_plan_page.dart';
-import 'setting_page.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -60,140 +57,28 @@ class HomePage extends StatelessWidget {
                   left: 16,
                   child: Row(
                     children: [
-                      // User Profile Picture Placeholder
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.white,
-                        child: user?.photoURL != null
-                            ? ClipOval(
-                          child: Image.network(
-                            user!.photoURL!,
-                            fit: BoxFit.cover,
-                            width: 60,
-                            height: 60,
-                          ),
-                        )
-                            : const Icon(Icons.person, size: 30, color: Colors.grey),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Hello,',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          Text(
-                            user?.displayName ?? 'User',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // App Title
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 90),
-                    child: const Text(
-                      'ETTIZAN',
-                      style: TextStyle(
-                        fontFamily: 'Raleway',
-                        fontSize: 40,
+                      const Center(
+                        child: Text(
+                          'ETTIZAN',
+                        style: TextStyle(
+                        fontFamily: 'Atop', // Replace 'Roboto' with your custom font name
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 6,
+                        // fontWeight: FontWeight.bold,
+                        fontSize: 42,
                       ),
-                    ),
-                  ),
-                ),
-                // Menu Button
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 10,
-                  right: 16,
-                  child: SafeArea(
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-                      color: const Color(0xFFF5F5DC), // Beige color for dropdown menu
-                      elevation: 6, // Adds shadow
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        ),
                       ),
-                      itemBuilder: (BuildContext context) {
-                        return [
-                          _buildMenuItem(
-                            icon: Icons.person,
-                            text: 'Profile',
-                            color: Colors.teal,
+                      // Back Arrow Button
+                      Positioned(
+                        top: 40,
+                        left: 16,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 28,
                           ),
-                          _buildMenuItem(
-                            icon: Icons.mail,
-                            text: 'Contact Us',
-                            color: Colors.blue,
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.settings,
-                            text: 'Settings',
-                            color: Colors.grey,
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.restaurant_menu,
-                            text: 'Nutrition Plans',
-                            color: Colors.orange,
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.fitness_center,
-                            text: 'Exercise Plans',
-                            color: Colors.purple,
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.logout,
-                            text: 'Log Out',
-                            color: Colors.red,
-                          ),
-                        ];
-                      },
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'Profile':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const UserProfilePage()),
-                            );
-                            break;
-                          case 'Contact Us':
-                            _showContactDialog(context);
-                            break;
-                          case 'Settings':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SettingsPage()),
-                            );
-                            break;
-
-                          case 'Nutrition Plans':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const NutritionPage()),
-                            );
-                            break;
-                          case 'Exercise Plans':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const ExercisePlanPage()),
-                            );
-                            break;
-
-                          case 'Log Out':
+                          onPressed: () {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -213,7 +98,20 @@ class HomePage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Progress Section
+                  // Personalized Welcome Message
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Text(
+                      'Welcome, ${user?.displayName ?? 'User'}!',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Progress Bar Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Column(
@@ -226,16 +124,17 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
+                        // Progress Bar with enhanced design
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
-                            value: 0.0, // Example progress (50%)
+                            value: 0, // Example: 60% progress
                             minHeight: 12,
                             backgroundColor: Colors.grey[300],
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF40E0D0)),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 213, 54, 54)),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         const Text(
                           '0% Completed',
                           style: TextStyle(
@@ -244,11 +143,12 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        // Motivational Message
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Text(
                             'Every journey starts with a single step—let’s get started!',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               color: Colors.teal,
                               fontWeight: FontWeight.w600,
@@ -259,15 +159,68 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  // Water Reminder
-                  _buildWaterReminder(),
-                  const SizedBox(height: 20),
-                  // Example Meals Section
-                  _buildExampleMeal(),
-                  const SizedBox(height: 20),
-                  // Example Exercises Section
-                  _buildExampleExercise(),
+                  const SizedBox(height: 30),
+                  // Spacer to push the icons to the bottom
+                  Spacer(),
+                  // Footer with Icon Boxes Section
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(30),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildIconBox(
+                          context,
+                          title: 'Exercises',
+                          icon: Icons.fitness_center,
+                          color: Colors.teal.shade300,
+                          onTap: () {
+                            // Navigate to Exercises Page
+                          },
+                        ),
+                        _buildIconBox(
+                          context,
+                          title: 'Nutrition',
+                          icon: Icons.fastfood,
+                          color: Colors.green.shade400,
+                          onTap: () {
+                            // Navigate to Nutrition Page
+                            Navigator.push(
+                              context,
+                                   MaterialPageRoute(
+                                    builder: (context) => const NutritionPage(),
+  ),
+                            );
+                          },
+                        ),
+                        _buildIconBox(
+                          context,
+                          title: 'Profile',
+                          icon: Icons.person,
+                          color: Color(0xFFFFB6C1),
+                          onTap: () {
+                            // Navigate to Profile Page
+                            Navigator.push(
+                              context,
+                                  MaterialPageRoute(builder: (context) => const UserProfilePage()),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
