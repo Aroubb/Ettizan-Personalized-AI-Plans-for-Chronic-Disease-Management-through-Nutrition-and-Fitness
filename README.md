@@ -68,6 +68,10 @@ For inquiries or contributions, contact us at **Ettizanapp@gmail.com**.
 - **Leena Dakhil Allah Algashami**  
 - **Ohoud Ali Kaabi**
 - **Layan Abdulaziz Almanaa**
+
+
+##  Supervisor
+- Dr. Raad Alturki
 ```
 
 
