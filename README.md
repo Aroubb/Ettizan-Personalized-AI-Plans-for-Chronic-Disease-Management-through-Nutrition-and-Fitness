@@ -1,12 +1,6 @@
 # Ettizan
 
 ![Ettizan Logo](images/Ettizan_logo_enhanced22.png)  
-Here’s the `README.md` for **Ettizan** in a similar structured format:  
-
-```markdown
-# Ettizan
-
-![Ettizan Logo](path/to/logo.png)
 
 ## 📌 About Ettizan  
 Ettizan is a personalized AI-powered mobile application designed to assist individuals in managing chronic diseases through customized nutrition and fitness plans. By leveraging advanced AI and machine learning, the application analyzes user-specific health data to provide tailored recommendations, ensuring a more effective and user-friendly experience.
@@ -37,7 +31,6 @@ Ettizan is a personalized AI-powered mobile application designed to assist indiv
    ```bash
    git clone https://github.com/your-repo/ettizan.git
    cd ettizan
-   ```
 2. **Install dependencies:**  
    ```bash
    flutter pub get
