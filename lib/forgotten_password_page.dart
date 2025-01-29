@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+  const ForgotPasswordPage({super.key});
 
   @override
   _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
@@ -21,7 +21,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
 
     try {
-      // Send a password reset email
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -30,7 +29,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ),
       );
-      // Navigate back to the login page
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +42,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Header with Wave Design
+          // Header Section
           ClipPath(
             clipper: HeaderClipper(),
             child: Container(
@@ -52,8 +50,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF008080), // Teal
-                    Color(0xFF66BB6A), // Softer green
+                    Color(0xFF255744), // Teal
+                    Color(0xFF76D7C4), // Softer green
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -65,14 +63,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   style: TextStyle(
                     fontFamily: 'OfficialNICK',
                     color: Colors.white,
-                    fontSize: 42,
+                    fontSize: 45,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
           ),
-          // Reset Password Text Positioned Below Header
           Positioned(
             top: 200,
             left: 20,
@@ -88,6 +85,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
             ),
           ),
+          // Centered Reset Password Card
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -99,7 +97,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Adjust size to content
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       TextField(
                         controller: _emailController,
@@ -114,7 +112,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         child: ElevatedButton(
                           onPressed: _resetPassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF40E0D0), // Turquoise
+                            backgroundColor: const Color(0xFF40E0D0),
                             elevation: 10,
                             shadowColor: Colors.black.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
@@ -134,18 +132,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
             ),
           ),
-
+          // Back Button
           Positioned(
             top: 40,
             left: 16,
             child: IconButton(
               icon: const Icon(
                 Icons.arrow_back,
-                color: Colors.white,
-                size: 28,
+                color: Colors.white54,
+                size: 26,
               ),
               onPressed: () {
-                Navigator.pop(context); // Navigate back to the Login Page
+                Navigator.pop(context);
               },
             ),
           ),
@@ -155,17 +153,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 }
 
-// Custom Clipper for the Header's Curved Design
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 50);
     path.quadraticBezierTo(
-      size.width / 2, size.height, // Control point
-      size.width, size.height - 50, // End at bottom-right
+      size.width / 2, size.height,
+      size.width, size.height - 50,
     );
-    path.lineTo(size.width, 0); // Top-right
+    path.lineTo(size.width, 0);
     path.close();
     return path;
   }

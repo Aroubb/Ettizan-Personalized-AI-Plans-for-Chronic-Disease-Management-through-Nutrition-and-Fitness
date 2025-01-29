@@ -241,7 +241,6 @@ class _NutritionState extends State<Nutrition> {
     return false;
   }
 
-
   /// Generate a new plan or regenerate a specific meal via Gemini (AI), automatically saved
   /// Generate a new plan or regenerate a specific meal via Gemini (AI), automatically saved
   Future<void> _generateNutritionPlan(
@@ -1368,10 +1367,14 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset(
-                            imagee, // Path to your GIF
-                            width: 250, // Adjusted size to make the GIF bigger
-                            height: 250, // Adjusted size to make the GIF bigger
+                          Center(
+                            child: Image.asset(
+                              imagee, // Path to your GIF
+                              width:
+                                  150, // Adjusted size to make the GIF bigger
+                              height:
+                                  150, // Adjusted size to make the GIF bigger
+                            ),
                           ),
                           // Nutritional Info Section
                           const Divider(thickness: 1),
@@ -1607,13 +1610,13 @@ class NutritionalPieChart extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Center(
         child: Container(
-          height: 180, // Smaller height for a smaller chart
-          width: 180, // Width also adjusted to make it circular and compact
+          height: 150, // Smaller height for a smaller chart
+          width: 150, // Width also adjusted to make it circular and compact
           child: PieChart(
             PieChartData(
               sectionsSpace: 0,
               centerSpaceRadius:
-                  25, // Smaller center space radius for a compact look
+                  20, // Smaller center space radius for a compact look
               sections: [
                 // PieChartSectionData(
                 //   value: calories,

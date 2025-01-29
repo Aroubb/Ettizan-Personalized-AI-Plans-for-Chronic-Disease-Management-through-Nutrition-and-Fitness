@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'favorite_nutrition_plans_page.dart';
-import 'nutritionHistoryPage.dart';
 
 class HistoryPage extends StatelessWidget {
   final String userId;
@@ -11,7 +9,6 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Stream of all meal plan docs for this user, sorted by timestamp descending
     final plansStream = FirebaseFirestore.instance
         .collection('nutritionPlans')
         .doc(userId)
@@ -20,132 +17,25 @@ class HistoryPage extends StatelessWidget {
         .snapshots();
 
     return Scaffold(
-      // We remove the default AppBar to replicate the wave header style
       body: Stack(
         children: [
-          // Header Section with gradient & waves
-          Container(
-            height: 280,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Stack(
-              children: [
-                // First wave
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: WaveClipper(),
-                    child: Container(
-                      height: 100,
-                      color: const Color(0xFF008080).withOpacity(0.3),
-                    ),
-                  ),
-                ),
-                // Second wave
-                Positioned(
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: WaveClipper(),
-                    child: Container(
-                      height: 80,
-                      color: const Color(0xFF008080).withOpacity(0.5),
-                    ),
-                  ),
-                ),
-
-                // Page Title
-
-                // Back Button (top-left)
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 0,
-                  left: 16,
-                  child: SafeArea(
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 30,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.fastfood_outlined,
-                          size: 50,
-                          color: Colors.teal,
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-                      const Text(
-                        ' Nurtition Plans History',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontFamily: "Raleway",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 20,
-                  right: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FavoriteNutritionPlansPage(userId: 'user.id')), // Replace 'FavoritesPage' with your actual favorites page class
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-
-          // Main content
+          // Header Section
+          _buildHeader(context),
+          // Main Content
           Padding(
             padding: const EdgeInsets.only(top: 240),
             child: StreamBuilder<QuerySnapshot>(
               stream: plansStream,
               builder: (context, snapshot) {
-                // Show loading spinner if data is still being fetched
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                // If no plans exist, display a message
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No past plans found.',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  );
+                  return _buildEmptyState();
                 }
 
-                // We have data
                 final docs = snapshot.data!.docs;
 
-                // Build a ListView of plan cards
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: docs.length,
@@ -153,41 +43,42 @@ class HistoryPage extends StatelessWidget {
                     final doc = docs[index];
                     final data = doc.data() as Map<String, dynamic>?;
 
-                    // Extract meal lists
                     final breakfast = List<Map<String, dynamic>>.from(data?['Breakfast'] ?? []);
                     final lunch = List<Map<String, dynamic>>.from(data?['Lunch'] ?? []);
                     final dinner = List<Map<String, dynamic>>.from(data?['Dinner'] ?? []);
                     final snack = List<Map<String, dynamic>>.from(data?['Snack'] ?? []);
 
-                    // Convert Firestore timestamp to DateTime
                     final timestamp = data?['timestamp'] as Timestamp?;
                     final dateTime = timestamp?.toDate() ?? DateTime.now();
-
-                    // Format date/time
                     final formattedDate =
-                        '${dateTime.day}/${dateTime.month}/${dateTime.year}  '
-                        '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+                        '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+                    final formattedTime =
+                        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
 
                     return Card(
-                      elevation: 5,
+                      elevation: 6,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: ExpansionTile(
+                        tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                         title: Text(
-                          'Plan from $formattedDate',
+                          'Plan: $formattedDate at $formattedTime',
                           style: const TextStyle(
                             fontSize: 18,
+                            fontFamily: "Raleway",
+                            color: Colors.black87,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        subtitle: _buildPlanSummary(breakfast, lunch, dinner, snack),
                         childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         children: [
-                          _buildMealTile('Breakfast', breakfast),
-                          _buildMealTile('Lunch', lunch),
-                          _buildMealTile('Dinner', dinner),
-                          _buildMealTile('Snack', snack),
+                          _buildMealTile('Breakfast', breakfast, Icons.breakfast_dining),
+                          _buildMealTile('Lunch', lunch, Icons.lunch_dining),
+                          _buildMealTile('Dinner', dinner, Icons.dinner_dining),
+                          _buildMealTile('Snack', snack, Icons.fastfood),
                           const SizedBox(height: 8),
                         ],
                       ),
@@ -202,25 +93,239 @@ class HistoryPage extends StatelessWidget {
     );
   }
 
-  /// Helper widget to display each meal inside the ExpansionTile
-  Widget _buildMealTile(String mealTitle, List<Map<String, dynamic>> items) {
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      height: 280,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: WaveClipper(),
+              child: Container(
+                height: 100,
+                color: const Color(0xFF008080).withOpacity(0.3),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: WaveClipper(),
+              child: Container(
+                height: 80,
+                color: const Color(0xFF008080).withOpacity(0.5),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 0,
+            left: 16,
+            child: SafeArea(
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 30,
+            left: 0,
+            right: 0,
+            child: Column(
+              children: const [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.fastfood_outlined,
+                    size: 50,
+                    color: Colors.teal,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Nutrition Plans History',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: "Raleway",
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Review your past meal plans',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 20,
+            right: 10,
+            child: IconButton(
+              icon: const Icon(Icons.favorite, color: Colors.white, size: 28),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoriteNutritionPlansPage(userId: userId),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlanSummary(
+      List<Map<String, dynamic>> breakfast,
+      List<Map<String, dynamic>> lunch,
+      List<Map<String, dynamic>> dinner,
+      List<Map<String, dynamic>> snack,
+      ) {
+    final totalCalories = [
+      ...breakfast,
+      ...lunch,
+      ...dinner,
+      ...snack,
+    ].fold<double>(0, (sum, item) => sum + (item['calories'] ?? 0));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Text(
+        'Total Calories: ${totalCalories.toStringAsFixed(0)} kcal',
+        style: const TextStyle(fontSize: 14, color: Colors.grey),
+      ),
+    );
+  }
+
+  Widget _buildMealTile(String mealTitle, List<Map<String, dynamic>> items, IconData icon) {
     if (items.isEmpty) {
       return ListTile(
-        title: Text('$mealTitle:'),
-        subtitle: const Text('No items.'),
+        leading: Icon(icon, color: Colors.teal),
+        title: Text('$mealTitle: No items'),
       );
     }
-    return ListTile(
-      title: Text('$mealTitle:'),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: items.map((item) => Text('- $item')).toList(),
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: Icon(icon, color: Colors.teal),
+          title: Text('$mealTitle (${items.length} items)'),
+        ),
+        ...items.map((item) {
+          final ingredients = item['ingredients'];
+          final preparation = item['preparation'];
+
+          // Handle ingredients and preparation as either List or String
+          final ingredientDetails = ingredients is List
+              ? ingredients.join(', ')
+              : (ingredients ?? 'No ingredients provided');
+
+          final preparationDetails = preparation is List
+              ? preparation.join('. ')
+              : (preparation ?? 'No preparation details provided');
+
+          return Card(
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Meal Name
+                  Text(
+                    item['name'] ?? 'Unnamed Item',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Nutritional Info
+                  Text('Calories: ${item['calories'] ?? 0} kcal'),
+                  Text('Protein: ${item['protein'] ?? 0} g'),
+                  Text('Carbs: ${item['carbs'] ?? 0} g'),
+                  Text('Fat: ${item['fat'] ?? 0} g'),
+                  const Divider(thickness: 1, height: 20),
+                  // Ingredients Section
+                  ExpansionTile(
+                    leading: const Icon(Icons.list, color: Colors.teal),
+                    title: const Text(
+                      'Ingredients',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          ingredientDetails,
+                          style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Preparation Section
+                  ExpansionTile(
+                    leading: const Icon(Icons.receipt, color: Colors.teal),
+                    title: const Text(
+                      'Preparation',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          preparationDetails,
+                          style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+        const Divider(thickness: 1, height: 20),
+      ],
+    );
+  }
+
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Text(
+        'No past plans found.\nStart creating plans now!',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18, color: Colors.grey),
       ),
     );
   }
 }
 
-/// WaveClipper class to match the Nutrition page header
 class WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

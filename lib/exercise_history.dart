@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'favorite_exercise_plans_page.dart'; // Import UserInfo model
+import 'favorite_exercise_plans_page.dart';
+
 class ExerciseHistory extends StatefulWidget {
   const ExerciseHistory({super.key});
 
@@ -23,15 +24,13 @@ class _ExerciseHistoryState extends State<ExerciseHistory> {
     final User? user = _auth.currentUser;
     if (user != null) {
       try {
-        // Fetch exercise plans for the user from Firestore
         final querySnapshot = await _firestore
             .collection('exercisePlans')
             .doc(user.uid)
             .collection('dailyWorkouts')
-            .orderBy('timestamp', descending: true) // Order by timestamp (latest first)
+            .orderBy('timestamp', descending: true)
             .get();
 
-        // Parse the retrieved data
         setState(() {
           _exercisePlans = querySnapshot.docs.map((doc) {
             return {
@@ -58,120 +57,32 @@ class _ExerciseHistoryState extends State<ExerciseHistory> {
     super.initState();
     _fetchExerciseHistory();
   }
+
+  String _formatDate(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} at ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           // Header Section
-          Container(
-            height: 250,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: WaveClipper(),
-                    child: Container(
-                      height: 100,
-                      color: const Color(0xFF008080).withOpacity(0.3),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: WaveClipper(),
-                    child: Container(
-                      height: 80,
-                      color: const Color(0xFF008080).withOpacity(0.5),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 10, // Adjust for status bar height
-                  left: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pop(context); // Go back to the previous screen
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite, color: Colors.white,size: 28),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FavoritePlansPage(userId: 'user.id')), // Replace 'FavoritesPage' with your actual favorites page class
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 30,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.fitness_center,
-                          size: 50,
-                          color: Colors.teal,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Exercise History',
-                        style: TextStyle(
-                          fontFamily: "Raleway",
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Main Content Section
+          _buildHeader(context),
+          // Main Content
           Padding(
             padding: const EdgeInsets.only(top: 250),
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Loading Indicator
                   if (_isLoading)
                     const Center(child: CircularProgressIndicator()),
-                  // No Data Message
                   if (_exercisePlans.isEmpty && !_isLoading)
-                    const Center(child: Text('No exercise history found.')),
-                  // Exercise Plans List
+                    _buildEmptyState(),
                   if (!_isLoading && _exercisePlans.isNotEmpty)
                     ..._exercisePlans.map((exercisePlan) {
-                      final timestamp = (exercisePlan['timestamp'] as Timestamp)
-                          .toDate()
-                          .toString();
-
+                      final timestamp = _formatDate(exercisePlan['timestamp']);
                       return _buildExerciseCard(exercisePlan, timestamp);
                     }).toList(),
                 ],
@@ -183,30 +94,69 @@ class _ExerciseHistoryState extends State<ExerciseHistory> {
     );
   }
 
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          Icon(
+            Icons.fitness_center,
+            color: Colors.teal.shade200,
+            size: 80,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'No exercise history found.',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Start logging your workouts to track your progress!',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildExerciseCard(Map<String, dynamic> exercisePlan, String timestamp) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 12,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Plan Title with Timestamp
             ExpansionTile(
+              leading: const Icon(Icons.fitness_center, color: Colors.teal),
               title: Text(
-                'Exercise Plan - $timestamp',
+                'Exercise Plan\n($timestamp)',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal,
+                  fontFamily: "Raleway",
+                  color: Colors.black87,
                 ),
               ),
               children: [
-                _buildExerciseDetail('Warm-Up:', exercisePlan['warmUp']),
-                _buildExerciseDetail('Main Workout:', exercisePlan['mainWorkout']),
-                _buildExerciseDetail('Cool-Down:', exercisePlan['coolDown']),
+                // All exercises and notes inside the ExpansionTile
+                _buildExerciseSection('Warm-Up', exercisePlan['warmUp'], Icons.directions_run),
+                const Divider(),
+                _buildExerciseSection('Main Workout', exercisePlan['mainWorkout'], Icons.fitness_center),
+                const Divider(),
+                _buildExerciseSection('Cool-Down', exercisePlan['coolDown'], Icons.directions_walk),
+                const SizedBox(height: 8),
                 _buildExerciseDetail('Additional Notes:', exercisePlan['additionalNotes']),
               ],
             ),
@@ -216,6 +166,42 @@ class _ExerciseHistoryState extends State<ExerciseHistory> {
     );
   }
 
+  // Exercise Section with ExpansionTile
+  Widget _buildExerciseSection(String title, dynamic activities, IconData icon) {
+    return ExpansionTile(
+      leading: Icon(icon, color: Colors.teal),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+      children: activities.isEmpty
+          ? [
+        const Padding(
+          padding: EdgeInsets.all(8),
+          child: Text('- No activities found', style: TextStyle(fontSize: 14)),
+        )
+      ]
+          : activities.map<Widget>((activity) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          child: Row(
+            children: [
+              // Replaced checkmark with dots
+              const Icon(Icons.circle, size: 8, color: Colors.grey), // Circle as a dot
+              const SizedBox(width: 8),
+              Expanded(child: Text('- $activity', style: const TextStyle(fontSize: 14))),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // Additional Notes Section with ExpansionTile
   Widget _buildExerciseDetail(String title, dynamic activities) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,14 +214,128 @@ class _ExerciseHistoryState extends State<ExerciseHistory> {
             color: Colors.black87,
           ),
         ),
-        ...activities.map<Widget>((activity) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Text('- $activity', style: const TextStyle(fontSize: 14)),
-          );
-        }).toList(),
+        const SizedBox(height: 8),
+        if (activities.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Text('- No details available', style: TextStyle(fontSize: 14)),
+          )
+        else
+          ...activities.map<Widget>((activity) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.star_outline, color: Colors.yellow), // Star outline for notes
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('- $activity', style: const TextStyle(fontSize: 14))),
+                ],
+              ),
+            );
+          }).toList(),
         const SizedBox(height: 10),
       ],
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      height: 250,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF76D7C4), Color(0xFF66BB6A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: WaveClipper(),
+              child: Container(
+                height: 100,
+                color: const Color(0xFF008080).withOpacity(0.3),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: WaveClipper(),
+              child: Container(
+                height: 80,
+                color: const Color(0xFF008080).withOpacity(0.5),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10, // Adjust for status bar height
+            left: 10,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            right: 10,
+            child: IconButton(
+              icon: const Icon(Icons.favorite, color: Colors.white, size: 28),
+              onPressed: () {
+                final userId = _auth.currentUser?.uid ?? '';
+                if (userId.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FavoritePlansPage(userId: userId),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please log in first')),
+                  );
+                }
+              },
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 30,
+            left: 0,
+            right: 0,
+            child: Column(
+              children: const [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.fitness_center,
+                    size: 50,
+                    color: Colors.teal,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Exercise History',
+                  style: TextStyle(
+                    fontFamily: "Raleway",
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

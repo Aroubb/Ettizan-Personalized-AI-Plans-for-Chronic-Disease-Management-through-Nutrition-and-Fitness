@@ -65,6 +65,41 @@ class _MyNotesPageState extends State<MyNotesPage> {
     }
   }
 
+  void _editNote(int index) {
+    _noteController.text = _notes[index];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Note'),
+        content: TextField(
+          controller: _noteController,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            hintText: 'Enter your updated note here...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _notes[index] = _noteController.text.trim();
+                _noteController.clear();
+              });
+              _saveNotes();
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _deleteNote(int index) {
     setState(() {
       _notes.removeAt(index);
@@ -113,7 +148,7 @@ class _MyNotesPageState extends State<MyNotesPage> {
                     ),
                     Text(
                       'Keep track of your thoughts',
-                      style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -146,6 +181,7 @@ class _MyNotesPageState extends State<MyNotesPage> {
                 children: [
                   TextField(
                     controller: _noteController,
+                    maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Add a new note',
                       border: OutlineInputBorder(
@@ -160,17 +196,22 @@ class _MyNotesPageState extends State<MyNotesPage> {
                   const SizedBox(height: 16),
                   Expanded(
                     child: _notes.isEmpty
-                        ? const Center(
-                      child: Text(
-                        'No notes yet. Start adding some!',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
+                        ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.notes, size: 80, color: Colors.grey[400]),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'No notes yet. Start adding some!',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
                     )
                         : ListView.builder(
                       itemCount: _notes.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Card(
                             elevation: 6,
                             shape: RoundedRectangleBorder(
@@ -191,24 +232,27 @@ class _MyNotesPageState extends State<MyNotesPage> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              childrenPadding: const EdgeInsets.all(16.0),
-                              expandedAlignment: Alignment.centerLeft,
-                              expandedCrossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _notes[index],
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text(
+                                    _notes[index],
+                                    style: const TextStyle(fontSize: 14),
                                   ),
                                 ),
-                                const SizedBox(height: 10),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteNote(index),
-                                  ),
+                                const Divider(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.blue),
+                                      onPressed: () => _editNote(index),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _deleteNote(index),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -232,10 +276,8 @@ class WaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 20);
-    path.quadraticBezierTo(
-        size.width / 4, size.height, size.width / 2, size.height - 20);
-    path.quadraticBezierTo(
-        3 * size.width / 4, size.height - 40, size.width, size.height - 20);
+    path.quadraticBezierTo(size.width / 4, size.height, size.width / 2, size.height - 20);
+    path.quadraticBezierTo(3 * size.width / 4, size.height - 40, size.width, size.height - 20);
     path.lineTo(size.width, 0);
     path.close();
     return path;
