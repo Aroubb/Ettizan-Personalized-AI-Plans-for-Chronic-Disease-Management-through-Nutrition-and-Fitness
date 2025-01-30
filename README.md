@@ -18,6 +18,29 @@ Ettizan is a personalized AI-powered mobile application designed to assist indiv
 - **Backend & Database:** Firebase  
 - **AI:** Gemini
 
+## 🏗️ System Architecture
+
+The system follows a layered architecture with the following components:
+
+### 1. **Presentation Layer (Client)**
+- Mobile app (iOS/Android) with screens for Home, Meal Plans, Exercise Plans, History, Favorites, Profile, and Feedback.
+- Communicates with the Application Layer via the Gemini API.
+
+### 2. **Application Layer (Server)**
+- Core processing layer with:
+  - **AI Engine**: Generates personalized recommendations.
+  - **Goal Tracker**: Monitors progress.
+  - **Feedback Handler**: Collects user feedback.
+
+### 3. **Data Access Layer**
+- Manages communication between the Application Layer and the Database.
+- Includes API Gateway and Query Handlers for data retrieval and updates.
+
+### 4. **Database Layer**
+- Stores user data securely, including user profiles, recommendations, favorites, and feedback.
+
+![SystemArchitecture](images/Ettizan_logo_enhanced22.png)  
+
 
 ## 🏗️ Project Setup  
 
@@ -72,7 +95,7 @@ For inquiries or contributions, contact us at **Ettizanapp@gmail.com**.
 
 ##  Supervisor
 - Dr. Raad Alturki
-```
+
 
 
    
