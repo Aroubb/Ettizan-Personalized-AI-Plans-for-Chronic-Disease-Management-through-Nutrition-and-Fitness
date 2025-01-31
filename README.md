@@ -42,6 +42,33 @@ The system follows a layered architecture with the following components:
 ![SystemArchitecture](images/diagrams/SystemArchitecture.png)  
 
 
+### 🗂️ Entity-Relationship Diagram
+
+The **ER Diagram** visually represents the relationships between the main entities in the Ettizan app. Each entity corresponds to a collection in the database, ensuring efficient data management.
+
+#### Entities:
+- **User**: Stores personal and health data.
+- **UserProgress**: Tracks user progress over time.
+- **NutritionPlan**: Personalized meal plans.
+- **ExercisePlan**: Custom exercise routines.
+- **MealTitle**: Details of meals in a nutrition plan.
+- **ExerciseTitle**: Details of exercises in a workout plan.
+- **History**: Logs daily user activities and progress.
+- **Favorites**: Stores favorite plans for easy access.
+
+#### Relationships:
+- **User → UserProgress**: Tracks user health metrics.
+- **User → NutritionPlan/ExercisePlan**: Personalized plans for each user.
+- **NutritionPlan → MealTitle**: Daily meal records.
+- **ExercisePlan → ExerciseTitle**: Daily workout routines.
+- **User → Favorites**: Saves favorite plans.
+- **User → History**: Logs daily tasks and progress.
+
+This diagram illustrates how the app manages and uses user data for personalized recommendations.
+![SystemArchitecture](images/diagrams/ERdiagram.png)  
+
+
+
 ## 🏗️ Project Setup  
 
 ### Prerequisites  
