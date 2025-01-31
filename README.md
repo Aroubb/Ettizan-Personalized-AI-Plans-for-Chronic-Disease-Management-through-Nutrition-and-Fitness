@@ -68,6 +68,21 @@ This diagram illustrates how the app manages and uses user data for personalized
 ![SystemArchitecture](images/diagrams/ERdiagram.png)  
 
 
+### Activity Diagram: Requesting a Plan (Meal and Exercise Plan)
+
+The activity diagram outlines the steps a user follows when requesting a personalized meal and exercise plan:
+
+1. **User Input**: The user enters personal information (e.g., health data, preferences).
+2. **Request Submission**: The user submits the request for a plan.
+3. **Input Verification**: The system verifies the entered data for accuracy and completeness.
+   - **Decision Point**: If invalid data, the system prompts the user to correct it.
+4. **Plan Generation**: The system uses AI (Gemini) to generate a personalized meal and exercise plan.
+5. **Presentation**: The generated plan is displayed to the user.
+
+The flow also includes decision points for input validation and system responses, ensuring smooth interaction from start to finish.
+
+![ActivityDiagram](images/diagrams/ActivityDiagram.png)  
+
 
 ## 🏗️ Project Setup  
 
