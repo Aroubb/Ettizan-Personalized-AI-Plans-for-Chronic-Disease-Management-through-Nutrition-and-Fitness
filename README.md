@@ -124,7 +124,7 @@ Most existing health and fitness apps provide generic solutions that do not cate
 - **Integration with Wearables:** Support data sync from smartwatches and fitness trackers.  
 
 ## 📸 App Screenshots
-![SystemArchitecture](images/diagrams/EttizanScreens.pdf) 
+![EttizanScreens](images/diagrams/EttizanScreens.pdf) 
 
 
 ## 📬 Contact  
