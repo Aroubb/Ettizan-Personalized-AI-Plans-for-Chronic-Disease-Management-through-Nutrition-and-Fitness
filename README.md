@@ -42,7 +42,7 @@ The system follows a layered architecture with the following components:
 ![SystemArchitecture](images/diagrams/SystemArchitecture.png)  
 
 
-### 🗂️ Entity-Relationship Diagram
+## 🗂️ Entity-Relationship Diagram
 
 The **ER Diagram** visually represents the relationships between the main entities in the Ettizan app. Each entity corresponds to a collection in the database, ensuring efficient data management.
 
@@ -68,7 +68,7 @@ This diagram illustrates how the app manages and uses user data for personalized
 ![SystemArchitecture](images/diagrams/ERdiagram.png)  
 
 
-### Activity Diagram: Requesting a Plan (Meal and Exercise Plan)
+## Activity Diagram: Requesting a Plan (Meal and Exercise Plan)
 
 The activity diagram outlines the steps a user follows when requesting a personalized meal and exercise plan:
 
