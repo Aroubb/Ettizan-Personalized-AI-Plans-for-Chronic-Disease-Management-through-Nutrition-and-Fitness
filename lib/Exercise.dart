@@ -1417,7 +1417,7 @@ Return the response as a JSON object with the following structure:
                                               ),
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 16,
+                                                      horizontal: 13,
                                                       vertical: 14),
                                             ),
                                           ),

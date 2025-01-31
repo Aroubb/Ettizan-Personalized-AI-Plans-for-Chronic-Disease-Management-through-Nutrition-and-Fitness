@@ -20,7 +20,10 @@ class _HealthPageState extends State<HealthPage> {
   final List<String> _diseases = [
     'Diabetes',
     'Hypertension',
-    'High Cholesterol'
+    'High Cholesterol',
+    'Arthritis',
+    'Back pain',
+    'Osteoporosis'
   ];
   final List<String> _goals = ['Lose Weight', 'Maintain Weight', 'Gain Weight'];
 
