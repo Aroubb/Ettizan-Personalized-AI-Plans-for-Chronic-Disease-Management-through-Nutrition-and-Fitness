@@ -39,7 +39,7 @@ The system follows a layered architecture with the following components:
 ### 4. **Database Layer**
 - Stores user data securely, including user profiles, recommendations, favorites, and feedback.
 
-![SystemArchitecture](images/Ettizan_logo_enhanced22.png)  
+![SystemArchitecture](images/diagrams/SystemArchitecture.png)  
 
 
 ## 🏗️ Project Setup  
