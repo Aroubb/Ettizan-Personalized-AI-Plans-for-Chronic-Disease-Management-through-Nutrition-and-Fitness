@@ -123,6 +123,8 @@ Most existing health and fitness apps provide generic solutions that do not cate
 - **Community Features:** Enable peer support and expert consultations.  
 - **Integration with Wearables:** Support data sync from smartwatches and fitness trackers.  
 
+## 📸 App Screenshots
+![SystemArchitecture](images/diagrams/EttizanScreens.pdf) 
 
 
 ## 📬 Contact  
