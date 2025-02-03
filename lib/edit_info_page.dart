@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class EditInfoPage extends StatefulWidget {
   final String userId;
@@ -23,15 +24,26 @@ class _EditInfoPageState extends State<EditInfoPage> {
   late double height;
   late double weight;
 
+  final List<String> _diseases = [
+    'Diabetes',
+    'Hypertension',
+    'High Cholesterol',
+    'Arthritis',
+    'Back pain',
+    'Osteoporosis'
+  ];
+    List<String> selectedDiseases = [];
+
   @override
   void initState() {
     super.initState();
     goal = widget.userData['goal'] ?? 'Maintain Weight';
-    disease = widget.userData['disease'] ?? 'N/A';
+  disease = widget.userData['disease'] ?? 'N/A';
     foodPreference = widget.userData['foodPreference'] ?? 'N/A';
     allergies = widget.userData['allergies'] ?? 'N/A';
     height = double.tryParse(widget.userData['height'] ?? '0.0') ?? 0.0;
     weight = double.tryParse(widget.userData['weight'] ?? '0.0') ?? 0.0;
+    
   }
 
   Future<void> _saveChanges() async {
@@ -169,18 +181,32 @@ class _EditInfoPageState extends State<EditInfoPage> {
                         options: ['Lose Weight', 'Maintain Weight', 'Gain Weight'],
                         onChanged: (value) => setState(() => goal = value!),
                       ),
-                      const SizedBox(height: 10),
-                      _buildDropdownField(
-                        label: 'Disease',
-                        value: disease,
-                        options: [
-                          'N/A',
-                          'Diabetes',
-                          'Hypertension',
-                          'High Cholesterol'
-                        ],
-                        onChanged: (value) => setState(() => disease = value!),
-                      ),
+                              const SizedBox(height: 20),
+      _buildDropdownField(
+        label: 'Select Diseases',
+        value: disease, // Display the comma-separated string from selectedDiseases
+        options: _diseases, // The list of diseases
+        onChanged: (value) {
+          setState(() {
+            // You can update the selectedDiseases list here if needed
+            selectedDiseases = value != null ? value.split(', ') : [];
+            disease = value ?? '';
+          });
+        },
+      ),
+      MultiSelectDialogField(
+        title: Text('Select Your Disease(s)'),
+        items: _diseases
+            .map((disease) => MultiSelectItem(disease, disease))
+            .toList(),
+        initialValue: selectedDiseases,
+        onConfirm: (values) {
+          setState(() {
+            selectedDiseases = values.cast<String>();
+            disease = selectedDiseases.join(', ');
+          });
+        },
+      ),
                       const SizedBox(height: 10),
                       _buildDropdownField(
                         label: 'Food Preferences',
@@ -224,6 +250,7 @@ class _EditInfoPageState extends State<EditInfoPage> {
       ),
     );
   }
+
 
   Widget _buildDropdownField({
     required String label,
@@ -282,6 +309,7 @@ class _EditInfoPageState extends State<EditInfoPage> {
       ),
     );
   }
+  
 
   Widget _buildTextField({
     required String label,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'generalinfo_page.dart';
 import 'user_info.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class HealthPage extends StatefulWidget {
   final String userId;
@@ -27,12 +28,12 @@ class _HealthPageState extends State<HealthPage> {
   ];
   final List<String> _goals = ['Lose Weight', 'Maintain Weight', 'Gain Weight'];
 
-  String? _selectedDisease;
   String? _selectedGoal;
+  List<String> selectedDiseases = [];
 
   void _goToNextPage() {
-    if (_selectedDisease != null && _selectedGoal != null) {
-      widget.userInfo.disease = _selectedDisease;
+    if (selectedDiseases.isNotEmpty && _selectedGoal != null) {
+      widget.userInfo.disease = selectedDiseases.join(", "); // Store selected diseases as a string
       widget.userInfo.goal = _selectedGoal;
 
       Navigator.push(
@@ -44,7 +45,7 @@ class _HealthPageState extends State<HealthPage> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select your disease and goal')),
+        const SnackBar(content: Text('Please select your disease(s) and goal')),
       );
     }
   }
@@ -133,25 +134,19 @@ class _HealthPageState extends State<HealthPage> {
                                   fontSize: 16,
                                   color: Colors.black54,
                                   fontWeight: FontWeight.bold,
-
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(
-                                  labelText: 'Select Your Disease',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: _diseases.map((disease) {
-                                  return DropdownMenuItem<String>(
-                                    value: disease,
-                                    child: Text(disease),
-                                  );
-                                }).toList(),
-                                value: _selectedDisease,
-                                onChanged: (value) {
+                              MultiSelectDialogField(
+                                title: Text('Select Your Disease(s)'),
+                                items: _diseases
+                                    .map((disease) =>
+                                        MultiSelectItem(disease, disease))
+                                    .toList(),
+                                initialValue: selectedDiseases,
+                                onConfirm: (values) {
                                   setState(() {
-                                    _selectedDisease = value;
+                                    selectedDiseases = values.cast<String>();
                                   });
                                 },
                               ),
@@ -181,7 +176,6 @@ class _HealthPageState extends State<HealthPage> {
                                   onPressed: _goToNextPage,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF40E0D0),
-                                    // Turquoise
                                     elevation: 10,
                                     shadowColor: Colors.black.withOpacity(0.4),
                                     shape: RoundedRectangleBorder(
@@ -213,7 +207,7 @@ class _HealthPageState extends State<HealthPage> {
   }
 }
 
-  class HeaderClipper extends CustomClipper<Path> {
+class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();

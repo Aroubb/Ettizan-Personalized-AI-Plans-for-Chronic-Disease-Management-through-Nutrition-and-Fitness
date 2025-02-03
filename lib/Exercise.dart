@@ -171,17 +171,19 @@ class _ExerciseState extends State<Exercise> {
     // Fetch favorite exercises to include in the prompt
     final favoriteExercises = await _fetchFavoritePlans();
     final userExercises = await _fetchUserPlans();
-    final feedback = await _fetchExerciseFeedback();
+    final feedbacks = await _fetchExerciseFeedback();
 
     final prompt = exerciseType != null
         ? _buildPromptForExercise(
             exerciseType,
             feedback: feedback,
+            feedbacks: feedbacks,
             favoriteExercises: favoriteExercises,
             progressProvider: progressProvider,
           )
         : _buildPrompt(
             feedback: feedback,
+            feedbacks: feedbacks,
             favoriteExercises: favoriteExercises,
             userExercises: userExercises,
           );
@@ -468,7 +470,8 @@ class _ExerciseState extends State<Exercise> {
 
   /// Build AI prompt for generating a workout plan
   String _buildPrompt({
-    List<Map<String, dynamic>>? feedback,
+        String? feedback,
+    List<Map<String, dynamic>>? feedbacks,
     Map<String, List<String>>? favoriteExercises,
     Map<String, List<String>>? userExercises,
   }) {
@@ -524,7 +527,7 @@ $previousPlansDetails
 4. **Balance**: Include diverse types of exercises (e.g., strength, cardio, flexibility).
 5. **Disease-Specific Adjustments**: Tailor exercises to the user's chronic disease.
 6. **gender** suitable exercises
-
+7. Take into Account User $feedbacks especially $feedback
 ### JSON Output Format
 The output must be a valid JSON object with the following structure:
 - **totalCalories**: Total estimated calories burned. you should calculate from all the exercises! and it should be summed accurttly
@@ -595,7 +598,8 @@ The output must be a valid JSON object with the following structure:
 
   /// Build AI prompt for regenerating a specific workout plan section (e.g., Main Workout)
   String _buildPromptForExercise(String exerciseType,
-      {List<Map<String, dynamic>>? feedback,
+      {    String? feedback,
+        List<Map<String, dynamic>>? feedbacks,
       Map<String, List<String>>? favoriteExercises,
       Map<String, List<String>>? userExercises,
       ProgressProvider? progressProvider}) {
@@ -659,7 +663,7 @@ Return the response as a JSON object with the following structure:
   - **calories_burned**: Estimated calories burned.
   you should take the $_totalCalories and subtract it from the previous $exerciseType calories and then add it to the current $exerciseType calories
   and you shouldn't change the other exercises calories!
-
+    10. Take into Account User $feedbacks especially $feedback
 **Example Output**:
 {
   "totalCalories": 300,

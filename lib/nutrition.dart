@@ -259,16 +259,18 @@ class _NutritionState extends State<Nutrition> {
     // Fetch favorite plans to include in the prompt
     final favoritePlans = await _fetchFavoritePlans();
     final previousPlans = await _fetchUserPlans();
-    final feedback = await _fetchFeedback();
+    final feedbacks = await _fetchFeedback();
 
     final prompt = mealType != null
         ? _buildPromptForMeal(
             mealType,
             feedback: feedback,
+            feedbacks: feedbacks,
             favoritePlans: favoritePlans,
           )
         : _buildPrompt(
             feedback: feedback,
+            feedbacks: feedbacks,
             favoritePlans: favoritePlans,
             previousPlans: previousPlans);
 
@@ -558,7 +560,8 @@ images/AlmondStuffDates.png.webp
 
   /// Build the prompt for generating the entire plan
   String _buildPrompt({
-    List<Map<String, dynamic>>? feedback,
+    String? feedback,
+    List<Map<String, dynamic>>? feedbacks,
     Map<String, List<Map<String, dynamic>>>? favoritePlans,
     Map<String, List<Map<String, dynamic>>>?
         previousPlans, // Added parameter for previous plans
@@ -647,7 +650,7 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
        - **Description:** Brief description of the meal.
        - **Preparation Instructions:** Step-by-step method to prepare the meal.
        - **Nutritional Info:** Include calories, protein, carbs, and fat content.
-       -**image:** Include image path only the folowing paths $imagePaths are available
+      -**image:** Include image path only the folowing paths $imagePaths are available
 
     
     4. Ensure the meals are culturally appropriate (e.g., Saudi meals).
@@ -656,7 +659,8 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
     7. take meals ideas from $localMeals
     8. take ideas from images
     9.  6. Aim for 1 unique options for each meal type, drawing from the meal plans provided $mealPlansReference.
-
+    10. Take into Account User $feedbacks especially $feedback
+don't make oatmeal
     Return the result as JSON in this format:
     {
       "Breakfast": [
@@ -746,7 +750,8 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
   // Build the prompt for regenerating a specific meal
   String _buildPromptForMeal(
     String mealType, {
-    List<Map<String, dynamic>>? feedback,
+          String? feedback,
+    List<Map<String, dynamic>>? feedbacks,
     Map<String, List<Map<String, dynamic>>>? favoritePlans,
     Map<String, List<Map<String, dynamic>>>?
         previousPlans, // Added parameter for previous plans
@@ -816,7 +821,8 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
     7. take meals ideas from $localMeals
     8. take ideas from images
     9. Aim for 1 unique options for each meal type, drawing from the meal plans provided $mealPlansReference.
-
+    10. Take into Account User $feedbacks especially $feedback
+    don't make oatmeal
   Return the result as JSON in this format:
   {
     "$mealType": [
