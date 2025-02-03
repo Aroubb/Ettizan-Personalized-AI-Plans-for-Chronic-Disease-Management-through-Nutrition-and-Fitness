@@ -660,7 +660,7 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
     8. take ideas from images
     9.  6. Aim for 1 unique options for each meal type, drawing from the meal plans provided $mealPlansReference.
     10. Take into Account User $feedbacks especially $feedback
-don't make oatmeal
+
     Return the result as JSON in this format:
     {
       "Breakfast": [
@@ -822,7 +822,7 @@ Snack: Greek yogurt with a sprinkle of chia seeds and fresh berries, Tahini and 
     8. take ideas from images
     9. Aim for 1 unique options for each meal type, drawing from the meal plans provided $mealPlansReference.
     10. Take into Account User $feedbacks especially $feedback
-    don't make oatmeal
+
   Return the result as JSON in this format:
   {
     "$mealType": [
