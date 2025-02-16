@@ -141,10 +141,11 @@ Most existing health and fitness apps provide generic solutions that do not cate
 For inquiries or contributions, contact us at **Ettizanapp@gmail.com**.  
 
 ## 👩‍💻 Development Team  
-- **Aroub Yousef Alomayrini**  
+- **Aroub Yousef Alomayrini**
+- **Layan Abdulaziz Almanaa**
 - **Leena Dakhil Allah Algashami**  
 - **Ohoud Ali Kaabi**
-- **Layan Abdulaziz Almanaa**
+
 
 
 ##  Supervisor
