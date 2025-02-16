@@ -5,6 +5,16 @@
 ## 📌 About Ettizan  
 Ettizan is a personalized AI-powered mobile application designed to assist individuals in managing chronic diseases through customized nutrition and fitness plans. By using advanced AI, the application analyzes user-specific health data to provide tailored recommendations, ensuring a more effective and user-friendly experience.
 
+---
+
+## 🎥 Demo  
+
+Watch our project demo to see **Ettizan** in action!  
+🔗 **[Ettizan Demo](https://drive.google.com/file/d/1URw75cFvuwYuPpdC8lyA23Tu7zW9y0wQ/view?usp=sharing)**  
+
+This demo provides an overview of the **app's features, functionality, and user experience**, showcasing how **AI-powered personalized health plans** assist individuals with chronic diseases.  
+
+---
 ## 🎯 Key Features  
 - **Personalized Nutrition Plans** – AI-generated meal recommendations based on health conditions and dietary preferences.  
 - **Custom Exercise Plans** – Exercise routines designed to fit users' health goals and fitness levels.  
